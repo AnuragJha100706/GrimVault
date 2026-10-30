@@ -1120,7 +1120,7 @@ def github_import():
     # Check if already imported
     existing = Project.query.filter(Project.github_url.ilike(f"%{owner}/{repo}%")).first()
     if existing:
-        flash(f"Repository '{owner}/{repo}' is already imported in DevVault!", 'warning')
+        flash(f"Repository '{owner}/{repo}' is already imported in GrimVault!", 'warning')
         return redirect(url_for('project_detail', project_id=existing.id))
 
     gh_token = SystemSetting.get('github_token')
@@ -1182,7 +1182,7 @@ def github_import():
     log_history(project.id, 'Created', f"Imported project directly from GitHub repository '{owner}/{repo}'.")
     db.session.commit()
 
-    flash(f"Successfully imported '{owner}/{repo}' into DevVault!", 'success')
+    flash(f"Successfully imported '{owner}/{repo}' into GrimVault!", 'success')
     return redirect(url_for('project_detail', project_id=project.id))
 
 @app.route('/project/<int:project_id>/github/sync', methods=['POST'])

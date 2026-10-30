@@ -1,4 +1,4 @@
-# DevVault: Advanced Engineering & Academic Repository System
+# GrimVault: Advanced Engineering & Academic Repository System
 ### *High-Performance Partitioned SQLite Architecture • Procedural Triggers • Vibrant Glassmorphic UI*
 
 <div align="center">
@@ -19,19 +19,19 @@
 
 ## 🌟 Overview
 
-**DevVault** is an enterprise-grade repository and artifact management platform engineered for software developers, engineering students, and researchers. It combines a **partitioned multi-database SQLite engine** with an **Aurora glassmorphic SaaS interface**.
+**GrimVault** is an enterprise-grade repository and artifact management platform engineered for software developers, engineering students, and researchers. It combines a **partitioned multi-database SQLite engine** with an **Aurora glassmorphic SaaS interface**.
 
-DevVault replaces bloated monolithic tools with a clean, focused system structured around **strictly 4 core navigation pages** and a dedicated **Single Project Workspace**, backed by cryptographic SHA-256 deliverable verification and automated local filesystem scanning (`E:\COMPLETE PROJECT`).
+GrimVault replaces bloated monolithic tools with a clean, focused system structured around **strictly 4 core navigation pages** and a dedicated **Single Project Workspace**, backed by cryptographic SHA-256 deliverable verification and automated local filesystem scanning (`E:\COMPLETE PROJECT`).
 
 ---
 
 ## 💎 Core Pages & User Experience
 
-DevVault features a modern **v2.4 Pro Glassmorphic UI** powered by Google Fonts (`Plus Jakarta Sans` and `JetBrains Mono`), Aurora mesh backgrounds, and a persistent dark/light mode toggle.
+GrimVault features a modern **v2.4 Pro Glassmorphic UI** powered by Google Fonts (`Plus Jakarta Sans` and `JetBrains Mono`), Aurora mesh backgrounds, and a persistent dark/light mode toggle.
 
 ```
 +---------------------------------------------------------------------------------------------------+
-|  [DevVault v2.4 Pro]     [Dashboard]   [Projects]   [GitHub Profile]   [Export & Import]   [@Anurag]  |
+|  [GrimVault v2.4 Pro]    [Dashboard]   [Projects]   [GitHub Profile]   [Export & Import]   [@Anurag]  |
 +---------------------------------------------------------------------------------------------------+
 ```
 
@@ -50,7 +50,7 @@ DevVault features a modern **v2.4 Pro Glassmorphic UI** powered by Google Fonts 
 ### 3. GitHub Profile & Sync (`/github`)
 - **Developer Showcase:** Profile card featuring an Aurora gradient banner, verified checkmark badge, developer bio, and 3 tinted stat boxes (Public Repos, Followers, Active Status).
 - **Direct Repository Importer:** Pulls repository metadata, descriptions, primary language, stars, forks, and `README.md` specs directly via the GitHub REST API.
-- **3-Column Public Repositories Grid:** Displays repositories with color-coded language tags (Python, JavaScript, C++, HTML/CSS), live star/fork counters, and one-click import into DevVault.
+- **3-Column Public Repositories Grid:** Displays repositories with color-coded language tags (Python, JavaScript, C++, HTML/CSS), live star/fork counters, and one-click import into GrimVault.
 
 ### 4. Export & Import Hub (`/export`)
 - **4 Partitioned Backup & Export Cards:**
@@ -69,11 +69,11 @@ DevVault features a modern **v2.4 Pro Glassmorphic UI** powered by Google Fonts 
 
 ## 🏛️ Advanced Database Architecture (ADBMS)
 
-DevVault uses a **partitioned multi-database SQLite architecture** with Write-Ahead Logging (WAL) and native Event-Condition-Action (ECA) procedural triggers:
+GrimVault uses a **partitioned multi-database SQLite architecture** with Write-Ahead Logging (WAL) and native Event-Condition-Action (ECA) procedural triggers:
 
 ```
                                  +-----------------------+
-                                 |  DevVault Application |
+                                 |  GrimVault Application|
                                  +-----------+-----------+
                                              |
                       +----------------------+----------------------+
