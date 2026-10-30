@@ -591,7 +591,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Floating Toast System */
-.devvault-toast-container {
+.devvault-toast-container,
+.grimvault-toast-container {
   position: fixed;
   bottom: 24px;
   right: 24px;
@@ -601,7 +602,8 @@ h1, h2, h3, h4, h5, h6 {
   gap: 10px;
 }
 
-.devvault-toast {
+.devvault-toast,
+.grimvault-toast {
   min-width: 280px;
   max-width: 400px;
   padding: 0.85rem 1.15rem;
@@ -676,6 +678,19 @@ h1, h2, h3, h4, h5, h6 {
   border-color: #6366f1;
   color: var(--text-main);
   box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25);
+}
+
+/* Modals */
+.modal-content {
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--border-glass-strong);
+  color: var(--text-main);
+  border-radius: 16px;
+  box-shadow: var(--card-shadow-hover);
+}
+
+.modal-header, .modal-footer {
+  border-color: var(--border-glass);
 }
 
 /* Profile Banner & Stat Boxes */

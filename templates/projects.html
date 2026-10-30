@@ -377,16 +377,45 @@
 {% block extra_scripts %}
 <script>
 function copyPathText(text, btnEl) {
-    navigator.clipboard.writeText(text).then(() => {
-        if (window.DevVaultToast) {
-            DevVaultToast.show('Path copied to clipboard: ' + text, 'success');
-        }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+            notifyCopySuccess(btnEl, text);
+        }).catch(() => {
+            fallbackCopy(text, btnEl);
+        });
+    } else {
+        fallbackCopy(text, btnEl);
+    }
+}
+
+function fallbackCopy(text, btnEl) {
+    const tempInput = document.createElement('textarea');
+    tempInput.value = text;
+    tempInput.style.position = 'fixed';
+    tempInput.style.opacity = '0';
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    try {
+        document.execCommand('copy');
+        notifyCopySuccess(btnEl, text);
+    } catch (e) {
+        console.error('Fallback copy failed', e);
+    }
+    document.body.removeChild(tempInput);
+}
+
+function notifyCopySuccess(btnEl, text) {
+    if (window.GrimVaultToast || window.DevVaultToast) {
+        const toast = window.GrimVaultToast || window.DevVaultToast;
+        toast.show('Path copied to clipboard: ' + text, 'success');
+    }
+    if (btnEl) {
         const originalIcon = btnEl.innerHTML;
         btnEl.innerHTML = '<i class="bi bi-check-lg text-success"></i>';
         setTimeout(() => {
             btnEl.innerHTML = originalIcon;
         }, 1500);
-    });
+    }
 }
 
 // Auto-open modal if ?open_modal=new in query string

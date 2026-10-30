@@ -142,6 +142,7 @@ window.DevVaultToast = {
         }, 3000);
     }
 };
+window.GrimVaultToast = window.DevVaultToast;
 
 /* ==========================================================================
    6. Chart.js Dashboard Visualizations
@@ -322,6 +323,7 @@ window.DevVaultCharts = {
         return this.charts[canvasId];
     }
 };
+window.GrimVaultCharts = window.DevVaultCharts;
 
 // Global theme change listener to automatically refresh Chart.js themes
 window.addEventListener('themeChanged', () => {
