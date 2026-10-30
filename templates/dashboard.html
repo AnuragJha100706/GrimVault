@@ -1,0 +1,361 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - DevVault Overview{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-4 py-4" style="max-width: 1440px;">
+    
+    <!-- Top Header Banner -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom border-secondary-subtle">
+        <div>
+            <div class="d-inline-flex align-items-center gap-2 mb-2">
+                <span class="badge rounded-pill px-3 py-1 bg-primary-subtle text-primary border border-primary-subtle font-monospace small">
+                    <span class="status-dot-pulse dot-pulse-blue me-1"></span> Centralized Engineering & Academic Workspace
+                </span>
+            </div>
+            <h1 class="h3 fw-extrabold mb-1 tracking-tight">Project Vault Overview</h1>
+            <p class="text-muted small mb-0">Track engineering repositories, academic deliverables, and live GitHub activity.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2 mt-3 mt-sm-0">
+            <a href="{{ url_for('export_hub') }}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1 rounded-3">
+                <i class="bi bi-arrow-left-right"></i> Import & Export
+            </a>
+            <a href="{{ url_for('github_hub') }}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1 rounded-3">
+                <i class="bi bi-github"></i> @AnuragJha100706
+            </a>
+            <a href="{{ url_for('projects_list', open_modal='new') }}" class="btn btn-gradient-indigo btn-sm d-inline-flex align-items-center gap-1 rounded-3 shadow-sm">
+                <i class="bi bi-plus-lg"></i> + New Project
+            </a>
+        </div>
+    </div>
+
+    <!-- Author & Local Vault Status Banner -->
+    <div class="glass-card mb-4 p-3 d-flex flex-wrap justify-content-between align-items-center gap-3" style="border-left: 4px solid #10b981;">
+        <div class="d-flex flex-wrap align-items-center gap-2 small">
+            <span class="status-dot-pulse dot-pulse-emerald"></span>
+            <span class="text-muted">Author: <strong class="text-body">Anurag Jha</strong></span>
+            <span class="text-secondary">&bull;</span>
+            <span class="text-muted">GitHub: <a href="https://github.com/AnuragJha100706" target="_blank" class="text-primary text-decoration-none font-monospace fw-semibold">@AnuragJha100706</a></span>
+            <span class="text-secondary d-none d-md-inline">&bull;</span>
+            <span class="text-muted d-none d-md-inline">Local Vault Root: 
+                <span class="badge bg-warning-subtle text-warning border border-warning-subtle font-monospace px-2 py-1">
+                    <i class="bi bi-folder-fill text-warning me-1"></i>E:\COMPLETE PROJECT
+                </span>
+            </span>
+        </div>
+        <div>
+            <a href="{{ url_for('export_hub') }}" class="btn btn-sm btn-gradient-emerald py-1 px-3 rounded-pill font-monospace" style="font-size: 0.8rem;">
+                <i class="bi bi-folder-check me-1"></i> Scan Local Vault
+            </a>
+        </div>
+    </div>
+
+    <!-- 4 Colorful KPI Cards (Top Accent Gradient Bar + Tinted Icon Box) -->
+    <div class="row g-3 mb-4">
+        <!-- 1. Total Projects -->
+        <div class="col-6 col-lg-3">
+            <div class="glass-card glass-card-hover kpi-card h-100">
+                <div class="kpi-bar-indigo"></div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="kpi-metric-label">TOTAL PROJECTS</span>
+                    <div class="kpi-icon-box icon-box-indigo">
+                        <i class="bi bi-folder2-open"></i>
+                    </div>
+                </div>
+                <div class="d-flex align-items-baseline gap-2">
+                    <div class="kpi-metric-value">{{ total_projects }}</div>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle small font-monospace">+100% Indexed</span>
+                </div>
+                <div class="small text-muted mt-2 d-flex align-items-center gap-1 font-monospace" style="font-size: 0.76rem;">
+                    <span class="text-success fw-bold">{{ completed_projects }} completed</span> &bull; <span>{{ inprogress_projects }} active</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. In Progress -->
+        <div class="col-6 col-lg-3">
+            <div class="glass-card glass-card-hover kpi-card h-100">
+                <div class="kpi-bar-cyan"></div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="kpi-metric-label">IN PROGRESS</span>
+                    <div class="kpi-icon-box icon-box-cyan">
+                        <i class="bi bi-diagram-3"></i>
+                    </div>
+                </div>
+                <div class="d-flex align-items-baseline gap-2">
+                    <div class="kpi-metric-value text-primary">{{ inprogress_projects }}</div>
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle small font-monospace">Active Sprint</span>
+                </div>
+                <div class="small text-muted mt-2 d-flex align-items-center gap-1 font-monospace" style="font-size: 0.76rem;">
+                    <span class="status-dot-pulse dot-pulse-blue me-1"></span> Active development
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Vault Deliverables -->
+        <div class="col-6 col-lg-3">
+            <div class="glass-card glass-card-hover kpi-card h-100">
+                <div class="kpi-bar-emerald"></div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="kpi-metric-label">VAULT DELIVERABLES</span>
+                    <div class="kpi-icon-box icon-box-emerald">
+                        <i class="bi bi-file-earmark-check"></i>
+                    </div>
+                </div>
+                <div class="d-flex align-items-baseline gap-2">
+                    <div class="kpi-metric-value text-success">{{ total_deliverables }}</div>
+                    <span class="badge bg-purple-subtle text-purple border small font-monospace" style="background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.35);">Reports & PPTs</span>
+                </div>
+                <div class="small text-muted mt-2 d-flex align-items-center gap-1 font-monospace" style="font-size: 0.76rem;">
+                    <i class="bi bi-shield-check text-emerald me-1"></i> {{ total_reports_ppts }} Reports & PPTs + {{ total_deliverables - total_reports_ppts }} Archives
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. GitHub Linked -->
+        <div class="col-6 col-lg-3">
+            <div class="glass-card glass-card-hover kpi-card h-100">
+                <div class="kpi-bar-amber"></div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="kpi-metric-label">GITHUB LINKED</span>
+                    <div class="kpi-icon-box icon-box-amber">
+                        <i class="bi bi-github"></i>
+                    </div>
+                </div>
+                <div class="d-flex align-items-baseline gap-2">
+                    <div class="kpi-metric-value text-warning">{{ github_linked_count }}</div>
+                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle small font-monospace">Synced Live</span>
+                </div>
+                <div class="small text-muted mt-2 d-flex align-items-center gap-1 font-monospace text-truncate" style="font-size: 0.76rem;">
+                    {% if github_connected_user %}
+                    <i class="bi bi-link-45deg text-success"></i> Connected as @{{ github_connected_user }}
+                    {% else %}
+                    <a href="{{ url_for('github_hub') }}" class="text-primary text-decoration-none">Connect account &rarr;</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3 Colorful Chart.js Analytics Cards -->
+    <div class="row g-3 mb-4">
+        <!-- Chart 1: Status Distribution -->
+        <div class="col-lg-4">
+            <div class="glass-card h-100 p-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="small fw-bold text-uppercase text-muted">
+                        <i class="bi bi-pie-chart text-primary me-1"></i> Status Distribution
+                    </span>
+                    <span class="badge bg-body-tertiary border text-body font-monospace small">{{ total_projects }} Total</span>
+                </div>
+                <div style="height: 220px; position: relative;">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart 2: Projects by Category -->
+        <div class="col-lg-4">
+            <div class="glass-card h-100 p-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="small fw-bold text-uppercase text-muted">
+                        <i class="bi bi-bar-chart text-cyan me-1" style="color: #06b6d4;"></i> Projects by Category
+                    </span>
+                    <span class="badge bg-body-tertiary border text-body font-monospace small">{{ category_labels|length }} Categories</span>
+                </div>
+                <div style="height: 220px; position: relative;">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart 3: Top Tech Stack -->
+        <div class="col-lg-4">
+            <div class="glass-card h-100 p-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="small fw-bold text-uppercase text-muted">
+                        <i class="bi bi-layers text-purple me-1" style="color: #a855f7;"></i> Top Tech Stack
+                    </span>
+                    <span class="badge bg-body-tertiary border text-body font-monospace small">Frequency</span>
+                </div>
+                <div style="height: 220px; position: relative;">
+                    <canvas id="techChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Split: Recent Projects Table (8 Cols) + Activity Trail (4 Cols) -->
+    <div class="row g-3">
+        
+        <!-- Left: Recent Projects Table -->
+        <div class="col-lg-8">
+            <div class="glass-card h-100">
+                <div class="p-3 border-bottom border-secondary-subtle d-flex justify-content-between align-items-center">
+                    <span class="small fw-bold text-uppercase text-muted d-flex align-items-center gap-1">
+                        <i class="bi bi-clock-history text-primary"></i> Recently Updated Repositories
+                    </span>
+                    <a href="{{ url_for('projects_list') }}" class="small text-decoration-none text-primary font-monospace fw-semibold">
+                        View All Projects &rarr;
+                    </a>
+                </div>
+                <div class="table-responsive p-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light small text-muted font-monospace" style="font-size: 0.76rem;">
+                            <tr>
+                                <th class="ps-3">PROJECT</th>
+                                <th>CATEGORY</th>
+                                <th>STATUS</th>
+                                <th>LOCATION ON SYSTEM</th>
+                                <th>DELIVERABLES</th>
+                                <th class="text-end pe-3">ACTION</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in recent_projects %}
+                            <tr>
+                                <td class="ps-3">
+                                    <a href="{{ url_for('project_detail', project_id=p.id) }}" class="fw-bold text-decoration-none text-body">
+                                        {{ p.title }}
+                                    </a>
+                                    <div class="text-muted small text-truncate font-monospace" style="max-width: 180px; font-size: 0.72rem;">
+                                        {{ p.slug }}
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if p.category and 'AI' in p.category.name %}
+                                        <span class="pill-badge pill-ai">{{ p.category.name }}</span>
+                                    {% elif p.category and 'Web' in p.category.name %}
+                                        <span class="pill-badge pill-web">{{ p.category.name }}</span>
+                                    {% elif p.category and 'Academic' in p.category.name %}
+                                        <span class="pill-badge pill-academic">{{ p.category.name }}</span>
+                                    {% else %}
+                                        <span class="pill-badge pill-mobile">{{ p.category.name if p.category else 'General' }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="status-pill">
+                                        {% if p.status == 'Completed' %}
+                                            <span class="status-dot-pulse dot-pulse-emerald"></span>
+                                        {% elif p.status == 'In Progress' %}
+                                            <span class="status-dot-pulse dot-pulse-blue"></span>
+                                        {% elif p.status == 'Idea' %}
+                                            <span class="status-dot-pulse dot-pulse-purple"></span>
+                                        {% else %}
+                                            <span class="status-dot-pulse dot-pulse-amber"></span>
+                                        {% endif %}
+                                        {{ p.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-body-tertiary border text-muted font-monospace small text-truncate d-inline-block" style="max-width: 160px;" title="{{ p.local_path or 'E:\\COMPLETE PROJECT\\' ~ p.slug }}">
+                                        <i class="bi bi-folder-fill text-warning me-1"></i>{{ (p.local_path or 'E:\\COMPLETE PROJECT\\' ~ p.slug)|truncate(20, True, '...') }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle font-monospace small">
+                                        <i class="bi bi-file-earmark-check me-1"></i>{{ p.deliverables|length }} File{{ 's' if p.deliverables|length != 1 else '' }}
+                                    </span>
+                                </td>
+                                <td class="text-end pe-3">
+                                    <a href="{{ url_for('project_detail', project_id=p.id) }}" class="btn btn-sm btn-gradient-indigo py-1 px-3 rounded-pill font-monospace" style="font-size: 0.78rem;">
+                                        Open &rarr;
+                                    </a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted small">No projects recorded yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Activity Trail & Academic Readiness Card -->
+        <div class="col-lg-4">
+            <div class="glass-card h-100 p-3 d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-secondary-subtle">
+                    <span class="small fw-bold text-uppercase text-muted d-flex align-items-center gap-1">
+                        <i class="bi bi-activity text-success"></i> Audit Activity Trail
+                    </span>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle small font-monospace">Live CDC</span>
+                </div>
+                
+                <div class="flex-grow-1">
+                    {% if recent_history %}
+                    <div class="gradient-timeline">
+                        {% for item in recent_history[:6] %}
+                        <div class="gradient-timeline-item">
+                            <div class="gradient-timeline-node"></div>
+                            <div class="d-flex justify-content-between align-items-baseline">
+                                <span class="small fw-bold text-body">{{ item.action_type }}</span>
+                                <span class="text-muted font-monospace" style="font-size: 0.68rem;">{{ item.timestamp.strftime('%b %d, %H:%M') if item.timestamp else '' }}</span>
+                            </div>
+                            <p class="small text-muted mb-0" style="font-size: 0.8rem;">{{ item.description }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted small text-center py-4">No audit events recorded.</p>
+                    {% endif %}
+                </div>
+
+                <!-- Academic Readiness Card at Bottom -->
+                <div class="p-3 rounded-3 mt-3 border border-secondary-subtle bg-body-tertiary">
+                    <div class="d-flex justify-content-between align-items-center small mb-1">
+                        <span class="fw-bold text-body"><i class="bi bi-mortarboard-fill text-primary me-1"></i> Academic Readiness</span>
+                        <span class="text-success font-monospace fw-bold">100% Ready</span>
+                    </div>
+                    <div class="progress" style="height: 6px;">
+                        <div class="progress-bar progress-bar-custom bg-success" style="width: 100%;"></div>
+                    </div>
+                    <div class="text-muted small mt-1 font-monospace" style="font-size: 0.72rem;">
+                        4/4 Mandatory Submission Artifacts Configured
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- JSON Data Island for Chart.js Rendering -->
+<script id="dashboard-chart-data" type="application/json">
+{
+    "statusCounts": {{ status_counts | tojson }},
+    "categoryLabels": {{ category_labels | tojson }},
+    "categoryCounts": {{ category_counts | tojson }},
+    "techLabels": {{ tech_labels | tojson }},
+    "techCounts": {{ tech_counts | tojson }}
+}
+</script>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const dataElement = document.getElementById('dashboard-chart-data');
+    if (!dataElement) return;
+
+    try {
+        const chartData = JSON.parse(dataElement.textContent);
+        if (window.DevVaultCharts) {
+            // 1. Status Doughnut Chart (66% Cutout)
+            DevVaultCharts.initStatusDoughnut('statusChart', chartData.statusCounts || {});
+
+            // 2. Category Bar Chart with Vibrant Palette
+            DevVaultCharts.initCategoryBar('categoryChart', chartData.categoryLabels || [], chartData.categoryCounts || []);
+
+            // 3. Technologies Horizontal Bar Chart
+            DevVaultCharts.initTechHorizontalBar('techChart', chartData.techLabels || [], chartData.techCounts || []);
+        }
+    } catch (err) {
+        console.error('Error rendering dashboard charts:', err);
+    }
+});
+</script>
+{% endblock %}

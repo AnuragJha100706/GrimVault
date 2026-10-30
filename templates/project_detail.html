@@ -1,0 +1,451 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ project.title }} - DevVault Workspace{% endblock %}
+
+{% block content %}
+{% set cat_name = project.category.name if project.category else '' %}
+<div class="container-fluid px-lg-4 py-4" style="max-width: 1200px;">
+    
+    <!-- 1. Top Breadcrumb & Action Bar -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0 small">
+                <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" class="text-decoration-none">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('projects_list') }}" class="text-decoration-none">Projects</a></li>
+                <li class="breadcrumb-item active text-truncate font-monospace fw-semibold" aria-current="page" style="max-width: 320px;">{{ project.title }}</li>
+            </ol>
+        </nav>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('projects_list') }}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1 rounded-3">
+                <i class="bi bi-arrow-left"></i> &larr; All Projects
+            </a>
+            <button type="button" class="btn btn-sm d-inline-flex align-items-center gap-1 rounded-3 border" 
+                    style="background: rgba(244, 63, 94, 0.12); color: #f43f5e; border-color: rgba(244, 63, 94, 0.35);" 
+                    data-bs-toggle="modal" data-bs-target="#deleteProjectModal">
+                <i class="bi bi-trash"></i> Delete Project
+            </button>
+        </div>
+    </div>
+
+    <!-- 2. Hero Project Header Card (with 8px category-colored top gradient bar) -->
+    <div class="glass-card mb-4 shadow-sm position-relative overflow-hidden" 
+         style="border-top: 8px solid; border-image: {% if 'AI' in cat_name %}linear-gradient(90deg, #a855f7, #d946ef, #ec4899) 1{% elif 'Web' in cat_name %}linear-gradient(90deg, #22d3ee, #3b82f6, #4f46e5) 1{% elif 'Academic' in cat_name %}linear-gradient(90deg, #fbbf24, #f97316, #f43f5e) 1{% else %}linear-gradient(90deg, #34d399, #10b981, #06b6d4) 1{% endif %};">
+        <div class="card-body p-4">
+            
+            <!-- Row of Pills: Status, Category, Tech Stack -->
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                <span class="status-pill">
+                    {% if project.status == 'Completed' %}
+                        <span class="status-dot-pulse dot-pulse-emerald"></span>
+                    {% elif project.status == 'In Progress' %}
+                        <span class="status-dot-pulse dot-pulse-blue"></span>
+                    {% elif project.status == 'Idea' %}
+                        <span class="status-dot-pulse dot-pulse-purple"></span>
+                    {% else %}
+                        <span class="status-dot-pulse dot-pulse-amber"></span>
+                    {% endif %}
+                    {{ project.status }}
+                </span>
+                
+                {% if 'AI' in cat_name %}
+                    <span class="pill-badge pill-ai">{{ cat_name }}</span>
+                {% elif 'Web' in cat_name %}
+                    <span class="pill-badge pill-web">{{ cat_name }}</span>
+                {% elif 'Academic' in cat_name %}
+                    <span class="pill-badge pill-academic">{{ cat_name }}</span>
+                {% else %}
+                    <span class="pill-badge pill-mobile">{{ cat_name or 'General' }}</span>
+                {% endif %}
+
+                {% for t in project.technologies %}
+                <span class="pill-tech">{{ t.name }}</span>
+                {% endfor %}
+            </div>
+
+            <!-- Large Bold Project Title & Description -->
+            <h1 class="h3 fw-extrabold mb-2 tracking-tight text-body">{{ project.title }}</h1>
+            <p class="text-muted mb-0" style="max-width: 960px; font-size: 0.95rem; line-height: 1.6;">
+                {{ project.short_description or 'No summary recorded for this project repository.' }}
+            </p>
+        </div>
+    </div>
+
+    <!-- 3. Section 1: SYSTEM LOCATION & PROJECT LINKS Card (border-top: 4px solid #3b82f6) -->
+    <div class="glass-card mb-4 shadow-sm" style="border-top: 4px solid #3b82f6;">
+        <div class="p-3 px-4 border-bottom border-secondary-subtle d-flex justify-content-between align-items-center">
+            <span class="small fw-bold text-uppercase text-muted d-flex align-items-center gap-2">
+                <i class="bi bi-hdd-network text-primary fs-5"></i> SYSTEM LOCATION &amp; PROJECT LINKS
+            </span>
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace small">
+                Connected Resources
+            </span>
+        </div>
+        <div class="p-4">
+            <!-- Location in System Terminal Box -->
+            <div class="mb-4">
+                <label class="form-label small fw-bold text-muted text-uppercase mb-1">
+                    <i class="bi bi-folder-fill text-warning me-1"></i> Location in System
+                </label>
+                <div class="terminal-path-box p-2 px-3">
+                    <div class="d-flex align-items-center gap-2 text-truncate me-2">
+                        <i class="bi bi-pc-display text-primary fs-5"></i>
+                        <input type="text" id="localPathDisplay" 
+                               class="form-control-plaintext text-body font-monospace p-0 m-0 text-truncate" 
+                               value="{{ project.local_path or 'E:\\COMPLETE PROJECT\\' ~ (project.slug or 'project') }}" 
+                               readonly style="outline: none;">
+                    </div>
+                    <button class="btn btn-gradient-indigo btn-sm py-1 px-3 d-inline-flex align-items-center gap-1 text-nowrap rounded-pill font-monospace" 
+                            type="button" id="copyPathBtn" onclick="copyLocalPath()">
+                        <i class="bi bi-clipboard" id="copyIcon"></i> <span id="copyText">Copy Path</span>
+                    </button>
+                </div>
+                <div class="small text-muted mt-2 d-flex align-items-center gap-1 font-monospace" style="font-size: 0.78rem;">
+                    <i class="bi bi-check-circle-fill text-success"></i> 
+                    ✔ Path configured on system. Click &ldquo;Copy Path&rdquo; to open in Explorer or terminal.
+                </div>
+            </div>
+
+            <!-- 2-Column Link Sub-Cards -->
+            <div class="row g-3">
+                <!-- Left: GitHub Repository Link -->
+                <div class="col-md-6">
+                    <div class="p-3 rounded-3 border border-secondary-subtle bg-body-tertiary h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <span class="small fw-bold text-uppercase text-muted d-block mb-1">
+                                <i class="bi bi-github me-1"></i> GitHub Repository Link
+                            </span>
+                            {% if project.github_url %}
+                            <div class="fw-bold font-monospace small text-truncate text-body mb-1">
+                                {{ project.github_repo_slug or project.github_url }}
+                            </div>
+                            <div class="text-muted small text-truncate font-monospace" style="font-size: 0.76rem;">
+                                {{ project.github_url }}
+                            </div>
+                            {% else %}
+                            <p class="text-muted small mb-0">No GitHub repository linked to this project.</p>
+                            {% endif %}
+                        </div>
+                        <div class="pt-3">
+                            {% if project.github_url %}
+                            <a href="{{ project.github_url }}" target="_blank" class="btn btn-sm btn-dark w-100 d-inline-flex align-items-center justify-content-center gap-1 shadow-sm">
+                                <i class="bi bi-box-arrow-up-right me-1"></i> Open Repo
+                            </a>
+                            {% else %}
+                            <button type="button" class="btn btn-sm btn-outline-secondary w-100" onclick="document.getElementById('github_url_input').focus()">
+                                + Link Repository
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Live Project URL -->
+                <div class="col-md-6">
+                    <div class="p-3 rounded-3 border border-secondary-subtle bg-body-tertiary h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <span class="small fw-bold text-uppercase text-muted d-block mb-1">
+                                <i class="bi bi-globe text-cyan me-1" style="color: #06b6d4;"></i> Live Project URL
+                            </span>
+                            {% if project.live_url %}
+                            <div class="fw-bold small text-truncate text-primary mb-1">
+                                {{ project.live_url }}
+                            </div>
+                            <div class="text-muted small" style="font-size: 0.76rem;">Production / Deployment Link</div>
+                            {% else %}
+                            <p class="text-muted small mb-0">No live deployment URL configured.</p>
+                            {% endif %}
+                        </div>
+                        <div class="pt-3">
+                            {% if project.live_url %}
+                            <a href="{{ project.live_url }}" target="_blank" class="btn btn-sm btn-gradient-cyan w-100 d-inline-flex align-items-center justify-content-center gap-1 shadow-sm">
+                                <i class="bi bi-box-arrow-up-right me-1"></i> View Live
+                            </a>
+                            {% else %}
+                            <button type="button" class="btn btn-sm btn-outline-primary w-100" 
+                                    onclick="document.getElementById('live_url_input').scrollIntoView({behavior: 'smooth'}); document.getElementById('live_url_input').focus();">
+                                + Add URL
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Section 2: PROJECT REPORTS, PPTS & DOCUMENTS Card (border-top: 4px solid #10b981) -->
+    <div class="glass-card mb-4 shadow-sm" style="border-top: 4px solid #10b981;">
+        <div class="p-3 px-4 border-bottom border-secondary-subtle d-flex justify-content-between align-items-center">
+            <span class="small fw-bold text-uppercase text-muted d-flex align-items-center gap-2">
+                <i class="bi bi-file-earmark-check text-success fs-5"></i> PROJECT REPORTS, PPTS &amp; DOCUMENTS
+            </span>
+            <span class="badge bg-success-subtle text-success border border-success-subtle font-monospace small">
+                {{ project.deliverables|length }} File{{ 's' if project.deliverables|length != 1 else '' }} Attached
+            </span>
+        </div>
+        <div class="p-4">
+            
+            <!-- Deliverables Display -->
+            {% if project.deliverables %}
+            <div class="row g-3 mb-4">
+                {% for d in project.deliverables %}
+                <div class="col-md-6">
+                    <div class="p-3 rounded-3 border border-secondary-subtle bg-body-tertiary h-100 d-flex flex-column justify-content-between">
+                        <div class="d-flex align-items-start gap-3 mb-2">
+                            {% if 'Report' in d.deliverable_type or 'Synopsis' in d.deliverable_type %}
+                                <div class="p-2 rounded-2 bg-danger-subtle text-danger fs-4"><i class="bi bi-file-earmark-pdf"></i></div>
+                            {% elif 'Presentation' in d.deliverable_type or 'PPT' in d.deliverable_type %}
+                                <div class="p-2 rounded-2 bg-warning-subtle text-warning fs-4"><i class="bi bi-file-earmark-easel"></i></div>
+                            {% elif 'ZIP' in d.deliverable_type or 'Archive' in d.deliverable_type or 'Code' in d.deliverable_type %}
+                                <div class="p-2 rounded-2 bg-primary-subtle text-primary fs-4"><i class="bi bi-file-earmark-zip"></i></div>
+                            {% elif 'Diagram' in d.deliverable_type %}
+                                <div class="p-2 rounded-2 bg-success-subtle text-success fs-4"><i class="bi bi-file-earmark-image"></i></div>
+                            {% else %}
+                                <div class="p-2 rounded-2 bg-secondary-subtle text-secondary fs-4"><i class="bi bi-file-earmark-text"></i></div>
+                            {% endif %}
+                            
+                            <div class="text-truncate flex-grow-1">
+                                <h6 class="fw-bold mb-0 text-truncate text-body">{{ d.title }}</h6>
+                                <div class="d-flex align-items-center gap-2 mt-1">
+                                    <span class="badge bg-body-tertiary border font-monospace small">{{ d.deliverable_type }}</span>
+                                    <span class="badge bg-secondary-subtle text-body font-monospace small">{{ d.version or 'v1.0' }}</span>
+                                    <span class="text-muted font-monospace small">{{ d.human_file_size }}</span>
+                                </div>
+                                {% if d.notes %}
+                                <div class="text-muted small mt-1 font-monospace" style="font-size: 0.72rem;">{{ d.notes }}</div>
+                                {% endif %}
+                                {% if d.file_hash_sha256 %}
+                                <div class="text-muted small font-monospace mt-1" style="font-size: 0.7rem;" title="SHA-256 Hash">
+                                    <i class="bi bi-fingerprint text-success"></i> {{ d.file_hash_sha256[:16] }}...
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 pt-2 border-top border-secondary-subtle">
+                            <a href="{{ url_for('deliverable_download', deliverable_id=d.id) }}" class="btn btn-outline-primary btn-sm py-1 px-3 rounded-pill font-monospace" style="font-size: 0.78rem;">
+                                <i class="bi bi-download me-1"></i> Download
+                            </a>
+                            <form action="{{ url_for('deliverable_delete', deliverable_id=d.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete \'{{ d.title }}\'?');">
+                                <button type="submit" class="btn btn-outline-danger btn-sm py-1 px-2 rounded-pill font-monospace" style="font-size: 0.78rem;">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <!-- Styled Dashed Empty State Card -->
+            <div class="p-5 text-center rounded-3 border border-2 border-dashed border-secondary-subtle bg-body-tertiary mb-4">
+                <i class="bi bi-file-earmark-plus display-5 text-muted mb-2 d-block"></i>
+                <h6 class="fw-bold text-body mb-1">No Documents Attached Yet</h6>
+                <p class="text-muted small mb-0">Use the form below to attach your Project Report (.pdf/.docx), Presentation (.pptx), Synopsis, or Source Code ZIP.</p>
+            </div>
+            {% endif %}
+
+            <!-- Upload Sub-Card (ADD / UPLOAD PROJECT REPORT, PPT OR DOCUMENT) -->
+            <div class="p-3 rounded-3 border border-success-subtle" style="background: rgba(16, 185, 129, 0.04);">
+                <span class="small fw-bold text-uppercase text-success d-flex align-items-center gap-1 mb-3">
+                    <i class="bi bi-cloud-arrow-up-fill"></i> ADD / UPLOAD PROJECT REPORT, PPT OR DOCUMENT
+                </span>
+                
+                <form action="{{ url_for('project_upload_document', project_id=project.id) }}" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="next_url" value="{{ url_for('project_detail', project_id=project.id) }}">
+                    
+                    <!-- Row 1: 4 Columns -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">Document Title <span class="text-danger">*</span></label>
+                            <input type="text" name="title" class="form-control form-control-sm" placeholder="e.g. Final Project Report v1.0" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">Deliverable Type <span class="text-danger">*</span></label>
+                            <select name="deliverable_type" class="form-select form-select-sm" required>
+                                <option value="Project Report">Project Report (.pdf, .docx)</option>
+                                <option value="Presentation PPT">Presentation PPT (.pptx, .pdf)</option>
+                                <option value="Synopsis/Proposal">Synopsis / Proposal (.pdf)</option>
+                                <option value="ER/UML Diagram">System Diagrams (ER / DFD / UML)</option>
+                                <option value="Source Code ZIP">Source Code Archive (.zip)</option>
+                                <option value="Research Paper">Research Paper (.pdf)</option>
+                                <option value="Other">Other Document</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small fw-bold">Version</label>
+                            <input type="text" name="version" class="form-control form-control-sm font-monospace" value="v1.0" placeholder="v1.0">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">Select File <span class="text-danger">*</span></label>
+                            <input type="file" name="file" class="form-control form-control-sm" required accept=".pdf,.doc,.docx,.ppt,.pptx,.zip,.tar.gz,.png,.jpg,.jpeg">
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Notes input + Gradient Upload Submit Button -->
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-9">
+                            <label class="form-label small fw-bold">Notes / Description (Optional)</label>
+                            <input type="text" name="notes" class="form-control form-control-sm" placeholder="e.g. Final submission copy approved by mentor">
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-gradient-emerald btn-sm w-100 d-inline-flex align-items-center justify-content-center gap-1 shadow-sm py-1.5">
+                                <i class="bi bi-cloud-arrow-up"></i> Upload File
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 5. Section 3: EDIT PROJECT INFORMATION Card (border-top: 4px solid #f59e0b) -->
+    <div class="glass-card mb-4 shadow-sm" id="edit-project-info" style="border-top: 4px solid #f59e0b;">
+        <div class="p-3 px-4 border-bottom border-secondary-subtle d-flex justify-content-between align-items-center">
+            <span class="small fw-bold text-uppercase text-muted d-flex align-items-center gap-2">
+                <i class="bi bi-pencil-square text-warning fs-5"></i> EDIT PROJECT INFORMATION
+            </span>
+            <span class="badge bg-warning-subtle text-warning border border-warning-subtle font-monospace small">
+                Update Core Fields
+            </span>
+        </div>
+        <div class="p-4">
+            <form action="{{ url_for('project_edit_info', project_id=project.id) }}" method="POST">
+                <input type="hidden" name="next_url" value="{{ url_for('project_detail', project_id=project.id) }}">
+                
+                <div class="row g-3">
+                    <!-- Row 1: Title (6 cols), Category (3 cols), Status (3 cols) -->
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Project Title <span class="text-danger">*</span></label>
+                        <input type="text" name="title" class="form-control" value="{{ project.title }}" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold">Category</label>
+                        <select name="category_id" class="form-select">
+                            {% for c in all_categories %}
+                            <option value="{{ c.id }}" {% if project.category_id == c.id %}selected{% endif %}>{{ c.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold">Status</label>
+                        <select name="status" class="form-select">
+                            {% for s in ['Idea', 'In Progress', 'Completed', 'On Hold', 'Archived'] %}
+                            <option value="{{ s }}" {% if project.status == s %}selected{% endif %}>{{ s }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Row 2: Local System Directory Path in JetBrains Mono -->
+                    <div class="col-12">
+                        <label class="form-label small fw-bold">
+                            <i class="bi bi-folder-fill text-warning me-1"></i> Local System Directory Path
+                        </label>
+                        <input type="text" name="local_path" class="form-control font-monospace" 
+                               value="{{ project.local_path or '' }}" 
+                               placeholder="e.g. E:\COMPLETE PROJECT\{{ project.slug or 'my-project' }}">
+                        <div class="form-text small text-muted font-monospace" style="font-size: 0.74rem;">
+                            Direct system path to the project root folder under <code>E:\COMPLETE PROJECT\</code>.
+                        </div>
+                    </div>
+
+                    <!-- Row 3: GitHub Repo URL and Live Demo URL side by side -->
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">
+                            <i class="bi bi-github me-1"></i> GitHub Repository URL
+                        </label>
+                        <input type="url" name="github_url" id="github_url_input" class="form-control font-monospace" 
+                               value="{{ project.github_url or '' }}" 
+                               placeholder="https://github.com/AnuragJha100706/repo-name">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">
+                            <i class="bi bi-globe me-1 text-cyan" style="color: #06b6d4;"></i> Live Project Demo URL
+                        </label>
+                        <input type="url" name="live_url" id="live_url_input" class="form-control" 
+                               value="{{ project.live_url or '' }}" 
+                               placeholder="https://my-live-demo.vercel.app">
+                    </div>
+
+                    <!-- Row 4: Short Description textarea -->
+                    <div class="col-12">
+                        <label class="form-label small fw-bold">Short Description / Summary</label>
+                        <textarea name="short_description" rows="3" class="form-control" 
+                                  placeholder="Brief summary of the architecture and development journey...">{{ project.short_description or '' }}</textarea>
+                    </div>
+
+                    <!-- Bottom Right: Emerald-to-Teal Save Changes button -->
+                    <div class="col-12 text-end pt-2">
+                        <button type="submit" class="btn btn-gradient-emerald px-4 shadow-sm font-monospace">
+                            <i class="bi bi-check2-circle me-1"></i> &check; Save Changes
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<!-- Delete Project Confirmation Modal -->
+<div class="modal fade" id="deleteProjectModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content glass-card border-danger shadow-lg">
+            <div class="modal-header border-bottom border-secondary-subtle">
+                <h5 class="modal-title fs-6 fw-bold text-danger">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> Confirm Project Deletion
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-3">
+                <p class="small text-muted mb-2">Are you sure you want to permanently delete <strong>{{ project.title }}</strong>?</p>
+                <div class="alert alert-danger py-2 small mb-0 font-monospace" style="font-size: 0.78rem;">
+                    <i class="bi bi-info-circle me-1"></i> This will delete the database records across core, vault, and audit partitions.
+                </div>
+            </div>
+            <div class="modal-footer border-top border-secondary-subtle">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                <form action="{{ url_for('project_delete', project_id=project.id) }}" method="POST">
+                    <button type="submit" class="btn btn-danger btn-sm">Yes, Delete Project</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function copyLocalPath() {
+    const input = document.getElementById('localPathDisplay');
+    const copyText = document.getElementById('copyText');
+    const copyIcon = document.getElementById('copyIcon');
+    
+    if (input) {
+        navigator.clipboard.writeText(input.value).then(() => {
+            copyText.innerText = '✓ Copied!';
+            copyIcon.className = 'bi bi-check-lg text-success';
+            if (window.DevVaultToast) {
+                DevVaultToast.show('Path copied to clipboard: ' + input.value, 'success');
+            }
+            setTimeout(() => {
+                copyText.innerText = 'Copy Path';
+                copyIcon.className = 'bi bi-clipboard';
+            }, 2000);
+        }).catch(err => {
+            input.select();
+            document.execCommand('copy');
+            copyText.innerText = '✓ Copied!';
+            if (window.DevVaultToast) {
+                DevVaultToast.show('Path copied to clipboard: ' + input.value, 'success');
+            }
+            setTimeout(() => {
+                copyText.innerText = 'Copy Path';
+            }, 2000);
+        });
+    }
+}
+</script>
+{% endblock %}
+

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}DevVault: Engineering Repository & Information Management{% endblock %}</title>
+
+    <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    <!-- Vibrant Glassmorphic Stylesheet -->
+    <link rel="stylesheet" href="/static/css/style.css">
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- Sticky Glass Top Navbar (STRICTLY 4 NAVIGATION PAGES) -->
+    <header class="sticky-top navbar-glass">
+        <div class="container-fluid px-lg-4 d-flex align-items-center justify-content-between" style="max-width: 1440px;">
+            
+            <!-- Left: Brand + Pro Badge -->
+            <div class="d-flex align-items-center gap-3">
+                <a href="{{ url_for('dashboard') }}" class="text-decoration-none d-flex align-items-center gap-2">
+                    <div class="brand-icon-shield">
+                        <i class="bi bi-shield-lock-fill"></i>
+                    </div>
+                    <span class="brand-gradient-title">DevVault</span>
+                </a>
+                <span class="badge-version-pro d-none d-sm-inline">v2.4 Pro</span>
+            </div>
+
+            <!-- Center: Strictly 4 Navbar Pages in Glass Pill Container -->
+            <nav class="nav-pill-container d-none d-md-flex align-items-center">
+                <!-- 1. Dashboard -->
+                <a href="{{ url_for('dashboard') }}" 
+                   class="nav-glass-link {% if request.endpoint in ['dashboard', 'index'] %}active{% endif %}">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+                <!-- 2. Projects (Preserved Active on Detail View as well) -->
+                <a href="{{ url_for('projects_list') }}" 
+                   class="nav-glass-link {% if request.endpoint in ['projects_list', 'project_detail', 'project_create', 'project_edit'] %}active{% endif %}">
+                    <i class="bi bi-folder2-open"></i> Projects
+                </a>
+                <!-- 3. GitHub Profile -->
+                <a href="{{ url_for('github_hub') }}" 
+                   class="nav-glass-link {% if request.endpoint == 'github_hub' %}active{% endif %}">
+                    <i class="bi bi-github"></i> GitHub Profile
+                </a>
+                <!-- 4. Export & Import Hub -->
+                <a href="{{ url_for('export_hub') }}" 
+                   class="nav-glass-link {% if request.endpoint in ['export_hub', 'local_projects_hub'] %}active{% endif %}">
+                    <i class="bi bi-arrow-left-right"></i> Export & Import
+                </a>
+            </nav>
+
+            <!-- Right: Dark Mode Toggle & Anurag Jha Avatar Pill -->
+            <div class="d-flex align-items-center gap-3">
+                <!-- Theme Toggle Button -->
+                <button class="btn btn-outline-secondary btn-sm rounded-circle d-flex align-items-center justify-content-center" 
+                        id="theme-toggle-btn" 
+                        style="width: 36px; height: 36px; border-color: rgba(255,255,255,0.12);" 
+                        title="Toggle Light/Dark Mode">
+                    <i class="bi bi-moon-stars-fill text-warning" id="theme-icon"></i>
+                </button>
+
+                <!-- Profile Avatar Pill with Emerald Status Dot -->
+                <a href="{{ url_for('github_hub') }}" class="avatar-pill d-none d-sm-inline-flex">
+                    <div class="position-relative">
+                        <img src="https://github.com/AnuragJha100706.png" 
+                             alt="@AnuragJha100706" 
+                             class="rounded-circle border" 
+                             width="28" height="28" 
+                             onerror="this.src='https://ui-avatars.com/api/?name=Anurag+Jha&background=4f46e5&color=fff'">
+                        <span class="position-absolute bottom-0 end-0 p-1 bg-success border border-dark rounded-circle" style="transform: translate(25%, 25%);">
+                            <span class="visually-hidden">Online</span>
+                        </span>
+                    </div>
+                    <span class="small font-monospace fw-semibold text-truncate" style="max-width: 140px;">@AnuragJha100706</span>
+                </a>
+
+                <!-- Mobile Hamburger Offcanvas Trigger -->
+                <button class="btn btn-outline-secondary btn-sm d-md-none rounded-2" 
+                        type="button" 
+                        data-bs-toggle="collapse" 
+                        data-bs-target="#mobileNavCollapse">
+                    <i class="bi bi-list fs-5"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Dropdown (Strictly 4 Pages) -->
+        <div class="collapse d-md-none px-3 pt-2 pb-3 border-top border-secondary-subtle" id="mobileNavCollapse">
+            <div class="d-flex flex-column gap-2 mt-2">
+                <a href="{{ url_for('dashboard') }}" class="nav-glass-link {% if request.endpoint in ['dashboard', 'index'] %}active{% endif %}">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+                <a href="{{ url_for('projects_list') }}" class="nav-glass-link {% if request.endpoint in ['projects_list', 'project_detail'] %}active{% endif %}">
+                    <i class="bi bi-folder2-open"></i> Projects
+                </a>
+                <a href="{{ url_for('github_hub') }}" class="nav-glass-link {% if request.endpoint == 'github_hub' %}active{% endif %}">
+                    <i class="bi bi-github"></i> GitHub Profile
+                </a>
+                <a href="{{ url_for('export_hub') }}" class="nav-glass-link {% if request.endpoint in ['export_hub', 'local_projects_hub'] %}active{% endif %}">
+                    <i class="bi bi-arrow-left-right"></i> Export & Import
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Global Flash Alerts Container -->
+    <div class="container-fluid px-lg-4 mt-3" style="max-width: 1440px;">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category if category != 'danger' else 'danger' }} alert-dismissible fade show small glass-card border-{{ category }} shadow-sm py-2 px-3 mb-3 d-flex align-items-center justify-content-between" role="alert">
+                    <div class="d-flex align-items-center gap-2">
+                        {% if category == 'success' %}
+                            <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                        {% elif category == 'danger' %}
+                            <i class="bi bi-exclamation-triangle-fill text-danger fs-5"></i>
+                        {% elif category == 'warning' %}
+                            <i class="bi bi-exclamation-circle-fill text-warning fs-5"></i>
+                        {% else %}
+                            <i class="bi bi-info-circle-fill text-info fs-5"></i>
+                        {% endif %}
+                        <span>{{ message }}</span>
+                    </div>
+                    <button type="button" class="btn-close py-2" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Dynamic Page Content Block -->
+    <main class="flex-grow-1">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Global Floating Toast Notification Container -->
+    <div class="devvault-toast-container" id="devvault-toast-container"></div>
+
+    <!-- Minimalist Glass Footer -->
+    <footer class="footer py-3 border-top border-secondary-subtle mt-auto" style="background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(8px);">
+        <div class="container-fluid px-lg-4 d-flex flex-wrap justify-content-between align-items-center small text-muted" style="max-width: 1440px;">
+            <div class="d-flex align-items-center gap-2">
+                <span class="brand-gradient-title fs-6">DevVault</span>
+                <span>&bull;</span>
+                <span>&copy; 2026 <strong>Anurag Jha</strong>. Clean 4-Page System.</span>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <span>Storage Root: <code class="font-monospace text-body bg-body-tertiary px-2 py-0.5 rounded border border-secondary-subtle">E:\COMPLETE PROJECT</code></span>
+                <span class="d-none d-md-inline">&bull;</span>
+                <span class="badge bg-success-subtle text-success border border-success-subtle font-monospace d-none d-md-inline">
+                    <i class="bi bi-database-check me-1"></i> SQLite Partitioned (WAL)
+                </span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom Scripts -->
+    <script src="/static/js/main.js"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
+

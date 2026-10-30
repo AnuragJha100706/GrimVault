@@ -1,0 +1,298 @@
+{% extends "base.html" %}
+
+{% block title %}GitHub Profile & Repositories - DevVault{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-4 py-4" style="max-width: 1440px;">
+    
+    <!-- Top Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom border-secondary-subtle">
+        <div>
+            <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-2" 
+                 style="background: rgba(99, 102, 241, 0.12); border: 1px solid rgba(99, 102, 241, 0.25);">
+                <span class="status-dot-pulse dot-pulse-blue"></span>
+                <span class="small fw-semibold text-primary font-monospace">Live GitHub Synchronizer</span>
+            </div>
+            <h1 class="h3 fw-bold mb-1 d-flex align-items-center gap-2">
+                <i class="bi bi-github text-primary"></i> GitHub Profile &amp; Repositories
+            </h1>
+            <p class="text-muted small mb-0">Showcase public repositories, sync live metadata, and import code into your vault.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2 mt-3 mt-sm-0">
+            <a href="{{ url_for('projects_list') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                <i class="bi bi-folder2-open me-1"></i> View Projects
+            </a>
+            <button class="btn btn-outline-primary btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#githubSettingsModal">
+                <i class="bi bi-gear-fill me-1"></i> Settings / Token
+            </button>
+        </div>
+    </div>
+
+    <!-- Profile Overview & Direct Importer Split -->
+    <div class="row g-4 mb-4">
+        <!-- Left 4 Cols: Developer Profile Card -->
+        <div class="col-lg-4">
+            <div class="glass-card h-100 shadow-sm p-0 position-relative overflow-hidden">
+                <!-- Top Gradient Banner -->
+                <div class="profile-banner"></div>
+
+                <div class="p-4 pt-0">
+                    <!-- Avatar with Verified Checkmark -->
+                    <div class="d-flex justify-content-between align-items-end mb-3">
+                        <div class="profile-avatar-wrap">
+                            <img src="{{ (profile and profile.avatar_url) or 'https://github.com/AnuragJha100706.png' }}" 
+                                 alt="@{{ gh_username or 'AnuragJha100706' }}" 
+                                 class="rounded-circle border border-3 border-dark shadow" 
+                                 style="width: 82px; height: 82px; object-fit: cover;"
+                                 onerror="this.src='https://ui-avatars.com/api/?name=Anurag+Jha&background=4f46e5&color=fff'">
+                            <span class="position-absolute bottom-0 end-0 bg-dark rounded-circle p-1" style="transform: translate(10%, 10%);">
+                                <i class="bi bi-patch-check-fill text-success fs-5"></i>
+                            </span>
+                        </div>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle font-monospace small px-2 py-1 rounded-pill">
+                            <span class="status-dot-pulse dot-pulse-emerald me-1"></span> Synced
+                        </span>
+                    </div>
+
+                    <!-- Profile Name & Handle -->
+                    <div class="mb-3">
+                        <h4 class="fw-bold mb-0 text-white">{{ (profile and profile.name) or 'Anurag Kumar' }}</h4>
+                        <a href="https://github.com/{{ gh_username or 'AnuragJha100706' }}" target="_blank" class="text-decoration-none small text-primary font-monospace fw-semibold">
+                            @{{ gh_username or 'AnuragJha100706' }} <i class="bi bi-box-arrow-up-right small"></i>
+                        </a>
+                    </div>
+
+                    <!-- Bio -->
+                    <p class="small text-muted mb-4" style="line-height: 1.55;">
+                        {{ (profile and profile.bio) or 'Full-Stack Developer, AI Researcher & ADBMS Systems Architect | Building DevVault & Smart Academic Ecosystems.' }}
+                    </p>
+
+                    <!-- 3 Colorful Tinted Stat Boxes -->
+                    <div class="row g-2 mb-4 text-center">
+                        <div class="col-4">
+                            <div class="stat-box-indigo">
+                                <strong class="fs-5 d-block text-white fw-bold">{{ (profile and profile.public_repos) or repos|length or 13 }}</strong>
+                                <span class="small text-muted" style="font-size: 0.72rem;">Public Repos</span>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-box-purple">
+                                <strong class="fs-5 d-block text-white fw-bold">{{ (profile and profile.followers) or 8 }}</strong>
+                                <span class="small text-muted" style="font-size: 0.72rem;">Followers</span>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-box-emerald">
+                                <strong class="fs-5 d-block text-emerald fw-bold" style="color: #34d399;">Active</strong>
+                                <span class="small text-muted" style="font-size: 0.72rem;">Status</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-2">
+                        <a href="https://github.com/{{ gh_username or 'AnuragJha100706' }}" target="_blank" class="btn btn-gradient-indigo btn-sm flex-grow-1 rounded-pill py-2">
+                            <i class="bi bi-box-arrow-up-right me-1"></i> Open GitHub
+                        </a>
+                        <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#githubSettingsModal" title="Account Settings">
+                            <i class="bi bi-sliders"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right 8 Cols: Direct Repository Importer Card -->
+        <div class="col-lg-8">
+            <div class="glass-card h-100 shadow-sm p-4 position-relative overflow-hidden d-flex flex-column justify-content-between">
+                <!-- Top Blue-to-Purple Gradient Bar -->
+                <div style="position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);"></div>
+
+                <div>
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <span class="small fw-bold text-uppercase text-muted font-monospace d-flex align-items-center gap-2">
+                            <i class="bi bi-cloud-arrow-down-fill text-primary"></i> Direct Repository Importer
+                        </span>
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace small">
+                            REST API v3
+                        </span>
+                    </div>
+
+                    <h4 class="fw-bold mb-2 text-white">Import Repository Into Local Vault</h4>
+                    <p class="text-muted small mb-4" style="line-height: 1.6;">
+                        Import any public repository directly into DevVault. This pulls the repository description, primary technology language, live star count, open issues, and remote README content directly into your partitioned SQLite database.
+                    </p>
+
+                    <!-- Import Form -->
+                    <form action="{{ url_for('github_import') }}" method="POST" class="mb-4">
+                        <div class="input-group shadow-sm">
+                            <span class="input-group-text bg-dark-subtle font-monospace small text-muted border-secondary-subtle">
+                                <i class="bi bi-github me-1"></i> https://github.com/
+                            </span>
+                            <input type="text" 
+                                   name="full_name" 
+                                   class="form-control font-monospace border-secondary-subtle py-2 px-3" 
+                                   placeholder="AnuragJha100706/repository-name" 
+                                   value="{{ gh_username or 'AnuragJha100706' }}/" 
+                                   required>
+                            <button type="submit" class="btn btn-gradient-indigo px-4 d-inline-flex align-items-center gap-2">
+                                <i class="bi bi-cloud-download"></i> <span>Import into Vault</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- 3 Feature Badges -->
+                <div class="p-3 rounded-3" style="background: rgba(15, 23, 42, 0.4); border: 1px solid rgba(255, 255, 255, 0.05);">
+                    <div class="row g-2 small text-muted">
+                        <div class="col-md-4 d-flex align-items-center gap-2">
+                            <i class="bi bi-check2-circle text-success fs-5"></i>
+                            <span>Synchronizes Stars &amp; Forks</span>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-center gap-2">
+                            <i class="bi bi-check2-circle text-success fs-5"></i>
+                            <span>Pulls README.md Specs</span>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-center gap-2">
+                            <i class="bi bi-check2-circle text-success fs-5"></i>
+                            <span>Associates Tech Stack</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Public Repositories Showcase Card -->
+    <div class="glass-card shadow-sm mb-4 p-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom border-secondary-subtle">
+            <div>
+                <h5 class="fw-bold mb-1 d-flex align-items-center gap-2 text-white">
+                    <i class="bi bi-code-slash text-primary"></i> Public Repositories ({{ repos|length }})
+                </h5>
+                <p class="text-muted small mb-0">Synchronized public repositories available under @{{ gh_username or 'AnuragJha100706' }}.</p>
+            </div>
+            <a href="https://github.com/{{ gh_username or 'AnuragJha100706' }}?tab=repositories" target="_blank" class="small text-decoration-none text-primary fw-semibold mt-2 mt-sm-0">
+                View all on GitHub &rarr;
+            </a>
+        </div>
+
+        {% if repos %}
+        <div class="row g-3">
+            {% for r in repos %}
+            {% set r_slug = (r.full_name or (gh_username ~ '/' ~ r.name)) | lower %}
+            {% set is_linked = r_slug in linked_slugs %}
+            <div class="col-md-6 col-lg-4">
+                <div class="glass-card glass-card-hover h-100 p-3 d-flex flex-column justify-content-between">
+                    <div>
+                        <!-- Header: Name & Language Badge -->
+                        <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                            <h6 class="fw-bold mb-0 text-truncate font-monospace" style="max-width: 200px;">
+                                <a href="{{ r.html_url }}" target="_blank" class="text-decoration-none text-white hover-underline" title="{{ r.name }}">
+                                    {{ r.name }}
+                                </a>
+                            </h6>
+                            {% set lang = (r.language or 'Code') | lower %}
+                            {% if 'python' in lang %}
+                                <span class="badge badge-lang-python font-monospace small">{{ r.language }}</span>
+                            {% elif 'javascript' in lang or 'typescript' in lang %}
+                                <span class="badge badge-lang-javascript font-monospace small">{{ r.language }}</span>
+                            {% elif 'c++' in lang or 'c' == lang %}
+                                <span class="badge badge-lang-cpp font-monospace small">{{ r.language }}</span>
+                            {% elif 'html' in lang or 'css' in lang %}
+                                <span class="badge badge-lang-html font-monospace small">{{ r.language }}</span>
+                            {% else %}
+                                <span class="badge badge-lang-default font-monospace small">{{ r.language or 'Code' }}</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Description -->
+                        <p class="small text-muted mb-3" style="min-height: 40px; font-size: 0.82rem; line-height: 1.45;">
+                            {{ r.description or 'No description provided for this repository.' }}
+                        </p>
+                    </div>
+
+                    <!-- Footer: Stats & Vault Status -->
+                    <div class="d-flex justify-content-between align-items-center pt-2 border-top border-secondary-subtle small text-muted">
+                        <div class="d-flex gap-3">
+                            <span class="d-flex align-items-center gap-1 font-monospace">
+                                <i class="bi bi-star-fill text-warning" style="font-size: 0.75rem;"></i> {{ r.stars or 0 }}
+                            </span>
+                            <span class="d-flex align-items-center gap-1 font-monospace">
+                                <i class="bi bi-diagram-2 text-info" style="font-size: 0.75rem;"></i> {{ r.forks or 0 }}
+                            </span>
+                        </div>
+
+                        <div>
+                            {% if is_linked %}
+                                <div class="d-flex align-items-center gap-1">
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle font-monospace" style="font-size: 0.72rem;">
+                                        <i class="bi bi-check-circle-fill me-1"></i> In Vault
+                                    </span>
+                                    {% if r_slug in linked_project_map %}
+                                    <a href="{{ url_for('project_detail', project_id=linked_project_map[r_slug].id) }}" 
+                                       class="btn btn-outline-secondary btn-sm py-0 px-2 font-monospace" 
+                                       style="font-size: 0.72rem;" 
+                                       title="Open Project Workspace">
+                                        View &rarr;
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                <form action="{{ url_for('github_import') }}" method="POST" class="d-inline">
+                                    <input type="hidden" name="full_name" value="{{ r.full_name or (gh_username ~ '/' ~ r.name) }}">
+                                    <button type="submit" class="btn btn-gradient-indigo btn-sm py-0 px-2 font-monospace" style="font-size: 0.75rem;">
+                                        <i class="bi bi-plus-lg me-1"></i> Import
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5 text-muted small">
+            <i class="bi bi-github display-5 mb-3 text-secondary d-block"></i>
+            <h6 class="fw-bold text-white mb-1">No Repositories Synchronized</h6>
+            <p class="text-muted">Enter a repository name above or verify your GitHub username and token in settings.</p>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- GitHub Settings Modal -->
+<div class="modal fade" id="githubSettingsModal" tabindex="-1" aria-labelledby="githubSettingsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-card border-secondary-subtle">
+            <form action="{{ url_for('github_connect') }}" method="POST">
+                <div class="modal-header border-secondary-subtle">
+                    <h5 class="modal-title fw-bold fs-6 text-white d-flex align-items-center gap-2" id="githubSettingsModalLabel">
+                        <i class="bi bi-github text-primary"></i> GitHub Account &amp; API Settings
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body py-3">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">GitHub Username</label>
+                        <input type="text" name="username" class="form-control font-monospace" value="{{ gh_username or 'AnuragJha100706' }}" required>
+                        <div class="form-text small text-muted">Your public GitHub profile handle.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Personal Access Token (PAT) <span class="text-muted fw-normal">(Optional)</span></label>
+                        <input type="password" name="token" class="form-control font-monospace" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" value="{{ gh_token or '' }}">
+                        <div class="form-text small text-muted">Increases GitHub REST API limits from 60 to 5,000 requests per hour.</div>
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary-subtle">
+                    <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-gradient-indigo btn-sm rounded-pill px-4">Save &amp; Sync Settings</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

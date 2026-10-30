@@ -1,0 +1,404 @@
+{% extends 'base.html' %}
+
+{% block title %}Projects Repository - DevVault{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-4 py-4" style="max-width: 1440px;">
+    
+    <!-- Page Header & Actions Bar -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom border-secondary-subtle">
+        <div>
+            <div class="d-inline-flex align-items-center gap-2 mb-2">
+                <span class="badge rounded-pill px-3 py-1 bg-primary-subtle text-primary border border-primary-subtle font-monospace small">
+                    <i class="bi bi-folder-symlink me-1"></i> Multi-Category Repositories
+                </span>
+            </div>
+            <h1 class="h3 fw-extrabold mb-1 tracking-tight">Projects Repository</h1>
+            <p class="text-muted small mb-0">Browse and manage all local and remote projects, system storage paths, and academic reports.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2 mt-3 mt-sm-0">
+            <!-- Grid / Table View Switcher -->
+            <div class="btn-group btn-group-sm" role="group">
+                <a href="{{ url_for('projects_list', view='grid', q=keyword, category=selected_category, status=selected_status) }}" 
+                   class="btn btn-outline-secondary {% if view_mode != 'table' %}active text-white bg-primary border-primary{% endif %}" title="Grid View">
+                    <i class="bi bi-grid-fill"></i>
+                </a>
+                <a href="{{ url_for('projects_list', view='table', q=keyword, category=selected_category, status=selected_status) }}" 
+                   class="btn btn-outline-secondary {% if view_mode == 'table' %}active text-white bg-primary border-primary{% endif %}" title="Table View">
+                    <i class="bi bi-list-task"></i>
+                </a>
+            </div>
+            <a href="{{ url_for('export_hub') }}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1 rounded-3">
+                <i class="bi bi-arrow-left-right"></i> Import / Export
+            </a>
+            <button type="button" class="btn btn-gradient-indigo btn-sm d-inline-flex align-items-center gap-1 rounded-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#newProjectModal">
+                <i class="bi bi-plus-lg"></i> + New Project
+            </button>
+        </div>
+    </div>
+
+    <!-- Glassmorphic Search & Filter Bar -->
+    <div class="glass-card mb-4 p-3 shadow-sm">
+        <form action="{{ url_for('projects_list') }}" method="GET" class="row g-2 align-items-center">
+            <input type="hidden" name="view" value="{{ view_mode or 'grid' }}">
+
+            <div class="col-md-5">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-body-tertiary border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control form-control-sm border-start-0" 
+                           placeholder="Search by title, description, tech stack, or path... (Press / to focus)" 
+                           name="q" id="quickFilterInput" value="{{ keyword or '' }}">
+                </div>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <select name="category" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <option value="">All Categories</option>
+                    {% for c in categories %}
+                    <option value="{{ c.id }}" {% if selected_category == c.id %}selected{% endif %}>{{ c.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-6 col-md-2">
+                <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <option value="">All Statuses</option>
+                    {% for s in ['Idea', 'In Progress', 'Completed', 'On Hold', 'Archived'] %}
+                    <option value="{{ s }}" {% if selected_status == s %}selected{% endif %}>{{ s }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-2 d-flex gap-1">
+                <button type="submit" class="btn btn-gradient-indigo btn-sm w-100" title="Apply Filter">
+                    <i class="bi bi-funnel"></i> Filter
+                </button>
+                <a href="{{ url_for('projects_list') }}" class="btn btn-outline-secondary btn-sm" title="Reset Filters">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                </a>
+            </div>
+        </form>
+
+        <!-- Bottom Row: Project Counter & Clickable Category Chips -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mt-3 pt-2 border-top border-secondary-subtle small">
+            <div class="text-muted font-monospace" style="font-size: 0.78rem;">
+                Showing <strong class="text-body">{{ total_found }}</strong> project{{ 's' if total_found != 1 else '' }} in vault
+            </div>
+            <!-- Clickable Category Chips -->
+            <div class="d-flex flex-wrap gap-1 mt-1 mt-md-0">
+                <a href="{{ url_for('projects_list', view=view_mode) }}" 
+                   class="badge text-decoration-none {% if not selected_category %}bg-primary text-white{% else %}bg-body-tertiary text-muted border{% endif %} font-monospace px-2 py-1">
+                    All
+                </a>
+                {% for c in categories %}
+                <a href="{{ url_for('projects_list', category=c.id, view=view_mode) }}" 
+                   class="badge text-decoration-none {% if selected_category == c.id %}bg-primary text-white{% else %}bg-body-tertiary text-muted border{% endif %} font-monospace px-2 py-1">
+                    {{ c.name }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Projects Grid or Table Display -->
+    {% if projects %}
+        {% if view_mode == 'table' %}
+        <!-- Table View -->
+        <div class="glass-card shadow-sm mb-4">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light small text-muted font-monospace" style="font-size: 0.78rem;">
+                        <tr>
+                            <th class="ps-3">PROJECT TITLE</th>
+                            <th>CATEGORY</th>
+                            <th>STATUS</th>
+                            <th>LOCATION IN SYSTEM</th>
+                            <th>LINKS</th>
+                            <th>DELIVERABLES</th>
+                            <th class="text-end pe-3">ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in projects %}
+                        <tr class="filterable-project-item" data-search="{{ p.title|lower }} {{ p.short_description|lower }} {{ p.category.name|lower if p.category else '' }}">
+                            <td class="ps-3">
+                                <a href="{{ url_for('project_detail', project_id=p.id) }}" class="fw-bold text-decoration-none text-body">
+                                    {{ p.title }}
+                                </a>
+                                <div class="text-muted small text-truncate" style="max-width: 240px; font-size: 0.76rem;">
+                                    {{ p.short_description or 'No summary recorded.' }}
+                                </div>
+                            </td>
+                            <td>
+                                {% if p.category and 'AI' in p.category.name %}
+                                    <span class="pill-badge pill-ai">{{ p.category.name }}</span>
+                                {% elif p.category and 'Web' in p.category.name %}
+                                    <span class="pill-badge pill-web">{{ p.category.name }}</span>
+                                {% elif p.category and 'Academic' in p.category.name %}
+                                    <span class="pill-badge pill-academic">{{ p.category.name }}</span>
+                                {% else %}
+                                    <span class="pill-badge pill-mobile">{{ p.category.name if p.category else 'General' }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="status-pill">
+                                    {% if p.status == 'Completed' %}
+                                        <span class="status-dot-pulse dot-pulse-emerald"></span>
+                                    {% elif p.status == 'In Progress' %}
+                                        <span class="status-dot-pulse dot-pulse-blue"></span>
+                                    {% elif p.status == 'Idea' %}
+                                        <span class="status-dot-pulse dot-pulse-purple"></span>
+                                    {% else %}
+                                        <span class="status-dot-pulse dot-pulse-amber"></span>
+                                    {% endif %}
+                                    {{ p.status }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-body-tertiary border text-muted font-monospace small text-truncate d-inline-block" style="max-width: 220px;" title="{{ p.local_path or 'E:\\COMPLETE PROJECT\\' ~ p.slug }}">
+                                    <i class="bi bi-folder-fill text-warning me-1"></i>{{ (p.local_path or 'E:\\COMPLETE PROJECT\\' ~ p.slug)|truncate(26, True, '...') }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    {% if p.github_url %}
+                                    <a href="{{ p.github_url }}" target="_blank" class="text-body text-decoration-none small" title="GitHub Repo">
+                                        <i class="bi bi-github"></i>
+                                    </a>
+                                    {% endif %}
+                                    {% if p.live_url %}
+                                    <a href="{{ p.live_url }}" target="_blank" class="text-primary text-decoration-none small" title="Live Project">
+                                        <i class="bi bi-globe"></i>
+                                    </a>
+                                    {% endif %}
+                                    {% if not p.github_url and not p.live_url %}
+                                    <span class="text-muted small">-</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle font-monospace small">
+                                    <i class="bi bi-file-earmark-check me-1"></i>{{ p.deliverables|length }} File{{ 's' if p.deliverables|length != 1 else '' }}
+                                </span>
+                            </td>
+                            <td class="text-end pe-3">
+                                <a href="{{ url_for('project_detail', project_id=p.id) }}" class="btn btn-sm btn-gradient-indigo py-1 px-3 rounded-pill font-monospace" style="font-size: 0.78rem;">
+                                    Open Project &rarr;
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <!-- 3-Column Colorful Project Cards Grid -->
+        <div class="row g-3">
+            {% for p in projects %}
+            {% set cat_name = p.category.name if p.category else '' %}
+            <div class="col-md-6 col-lg-4 filterable-project-item" data-search="{{ p.title|lower }} {{ p.short_description|lower }} {{ cat_name|lower }}">
+                <div class="glass-card glass-card-hover h-100 d-flex flex-column {% if 'AI' in cat_name %}accent-bar-ai{% elif 'Web' in cat_name %}accent-bar-web{% elif 'Academic' in cat_name %}accent-bar-academic{% else %}accent-bar-mobile{% endif %}">
+                    <div class="p-3 p-md-4 flex-grow-1 d-flex flex-column">
+                        
+                        <!-- Top Row: Status pill + Category pill -->
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="status-pill">
+                                {% if p.status == 'Completed' %}
+                                    <span class="status-dot-pulse dot-pulse-emerald"></span>
+                                {% elif p.status == 'In Progress' %}
+                                    <span class="status-dot-pulse dot-pulse-blue"></span>
+                                {% elif p.status == 'Idea' %}
+                                    <span class="status-dot-pulse dot-pulse-purple"></span>
+                                {% else %}
+                                    <span class="status-dot-pulse dot-pulse-amber"></span>
+                                {% endif %}
+                                {{ p.status }}
+                            </span>
+                            
+                            {% if 'AI' in cat_name %}
+                                <span class="pill-badge pill-ai">{{ cat_name }}</span>
+                            {% elif 'Web' in cat_name %}
+                                <span class="pill-badge pill-web">{{ cat_name }}</span>
+                            {% elif 'Academic' in cat_name %}
+                                <span class="pill-badge pill-academic">{{ cat_name }}</span>
+                            {% else %}
+                                <span class="pill-badge pill-mobile">{{ cat_name or 'General' }}</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Title & 3-line Description -->
+                        <h5 class="fw-bold fs-6 mb-2">
+                            <a href="{{ url_for('project_detail', project_id=p.id) }}" class="text-decoration-none text-body">
+                                {{ p.title }}
+                            </a>
+                        </h5>
+                        <p class="text-muted small mb-3 flex-grow-1" style="min-height: 44px; font-size: 0.82rem; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                            {{ p.short_description or 'No summary provided for this project repository.' }}
+                        </p>
+
+                        <!-- Local Path Terminal Box -->
+                        <div class="terminal-path-box mb-3">
+                            <div class="d-flex align-items-center gap-1 text-truncate me-1" title="{{ p.local_path or 'E:\\COMPLETE PROJECT\\' ~ p.slug }}">
+                                <i class="bi bi-folder-fill text-warning"></i>
+                                <span class="text-muted text-truncate">{{ (p.local_path or 'E:\\COMPLETE PROJECT\\' ~ p.slug)|truncate(32, True, '...') }}</span>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-1 border-0" 
+                                    onclick="copyPathText('{{ (p.local_path or 'E:\\COMPLETE PROJECT\\' ~ p.slug)|replace('\\', '\\\\') }}', this)" 
+                                    title="Copy Path">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                        </div>
+
+                        <!-- Tech Stack Mini Pills -->
+                        <div class="d-flex flex-wrap gap-1 mb-2">
+                            {% for t in p.technologies[:4] %}
+                            <span class="pill-tech">{{ t.name }}</span>
+                            {% endfor %}
+                            {% if p.technologies|length > 4 %}
+                            <span class="pill-tech">+{{ p.technologies|length - 4 }}</span>
+                            {% endif %}
+                        </div>
+
+                    </div>
+
+                    <!-- Card Footer -->
+                    <div class="p-3 border-top border-secondary-subtle d-flex justify-content-between align-items-center bg-body-tertiary rounded-bottom-4">
+                        <div class="d-flex align-items-center gap-2">
+                            {% if p.github_url %}
+                            <a href="{{ p.github_url }}" target="_blank" class="text-body text-decoration-none small font-monospace" title="GitHub Repository">
+                                <i class="bi bi-github me-1"></i>Repo
+                            </a>
+                            {% endif %}
+                            {% if p.live_url %}
+                            <a href="{{ p.live_url }}" target="_blank" class="text-primary text-decoration-none small font-monospace" title="Live Demo">
+                                <i class="bi bi-globe me-1"></i>Live
+                            </a>
+                            {% endif %}
+                            <span class="badge bg-success-subtle text-success border border-success-subtle font-monospace small">
+                                <i class="bi bi-file-earmark-check me-1"></i>{{ p.deliverables|length }} File{{ 's' if p.deliverables|length != 1 else '' }}
+                            </span>
+                        </div>
+                        <a href="{{ url_for('project_detail', project_id=p.id) }}" class="btn btn-sm btn-gradient-indigo py-1 px-3 rounded-pill font-monospace" style="font-size: 0.78rem;">
+                            Open Project &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    {% else %}
+        <!-- Empty State -->
+        <div class="glass-card text-center py-5 shadow-sm">
+            <div class="card-body">
+                <i class="bi bi-inboxes display-4 text-muted mb-2 d-block"></i>
+                <h5 class="fw-bold">No Projects Found</h5>
+                <p class="text-muted small mb-3">No repositories match your current filter settings.</p>
+                <a href="{{ url_for('projects_list') }}" class="btn btn-outline-secondary btn-sm me-2">Reset Filters</a>
+                <button class="btn btn-gradient-indigo btn-sm" data-bs-toggle="modal" data-bs-target="#newProjectModal">Create New Project</button>
+            </div>
+        </div>
+    {% endif %}
+
+</div>
+
+<!-- Create New Project Modal -->
+<div class="modal fade" id="newProjectModal" tabindex="-1" aria-labelledby="newProjectModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content glass-card border-glass-strong shadow-lg">
+            <form action="{{ url_for('project_create') }}" method="POST">
+                <div class="modal-header border-bottom border-secondary-subtle">
+                    <h5 class="modal-title fw-bold" id="newProjectModalLabel">
+                        <i class="bi bi-plus-circle text-primary me-2"></i> Register New Project Repository
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label small fw-bold">Project Title <span class="text-danger">*</span></label>
+                            <input type="text" name="title" class="form-control" placeholder="e.g. The Velvet Fork Dining Platform" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">Category</label>
+                            <select name="category_id" class="form-select">
+                                {% for c in categories %}
+                                <option value="{{ c.id }}">{{ c.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">Status</label>
+                            <select name="status" class="form-select">
+                                <option value="In Progress" selected>In Progress</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Idea">Idea</option>
+                                <option value="On Hold">On Hold</option>
+                                <option value="Archived">Archived</option>
+                            </select>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label small fw-bold">
+                                <i class="bi bi-folder-fill text-warning me-1"></i> Location in System (Local Path)
+                            </label>
+                            <input type="text" name="local_path" class="form-control font-monospace" placeholder="e.g. E:\COMPLETE PROJECT\my-project-name">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">
+                                <i class="bi bi-github me-1"></i> GitHub Repository URL
+                            </label>
+                            <input type="url" name="github_url" class="form-control font-monospace" placeholder="https://github.com/AnuragJha100706/my-repo">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">
+                                <i class="bi bi-globe me-1 text-info"></i> Live Demo / Deployment URL
+                            </label>
+                            <input type="url" name="live_url" class="form-control" placeholder="https://my-app.vercel.app">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">Short Description / Subtitle</label>
+                            <textarea name="short_description" rows="2" class="form-control" placeholder="Brief summary of the project..."></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top border-secondary-subtle">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-gradient-indigo btn-sm px-3 shadow-sm">
+                        <i class="bi bi-check2-circle me-1"></i> Create Project
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function copyPathText(text, btnEl) {
+    navigator.clipboard.writeText(text).then(() => {
+        if (window.DevVaultToast) {
+            DevVaultToast.show('Path copied to clipboard: ' + text, 'success');
+        }
+        const originalIcon = btnEl.innerHTML;
+        btnEl.innerHTML = '<i class="bi bi-check-lg text-success"></i>';
+        setTimeout(() => {
+            btnEl.innerHTML = originalIcon;
+        }, 1500);
+    });
+}
+
+// Auto-open modal if ?open_modal=new in query string
+document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('open_modal') === 'new') {
+        const modalEl = document.getElementById('newProjectModal');
+        if (modalEl) {
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+        }
+    }
+});
+</script>
+{% endblock %}

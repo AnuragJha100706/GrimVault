@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+
+{% block title %}Export &amp; Import Hub - DevVault{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-4 py-4" style="max-width: 1440px;">
+
+    <!-- Top Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom border-secondary-subtle">
+        <div>
+            <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-2" 
+                 style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.25);">
+                <span class="status-dot-pulse dot-pulse-emerald"></span>
+                <span class="small fw-semibold text-emerald font-monospace" style="color: #34d399;">Enterprise Backup &amp; Storage Hub</span>
+            </div>
+            <h1 class="h3 fw-bold mb-1 d-flex align-items-center gap-2">
+                <i class="bi bi-arrow-left-right text-primary"></i> Export &amp; Import Hub
+            </h1>
+            <p class="text-muted small mb-0">Download partitioned database backups, export catalogs, and synchronize projects directly from <code class="font-monospace text-warning">{{ root_dir }}</code>.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2 mt-3 mt-sm-0">
+            <a href="{{ url_for('projects_list') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                <i class="bi bi-folder2-open me-1"></i> View Projects
+            </a>
+            <a href="{{ url_for('export_database_backup') }}" class="btn btn-gradient-indigo btn-sm rounded-pill px-3 shadow-sm">
+                <i class="bi bi-download me-1"></i> Backup All Databases (.zip)
+            </a>
+        </div>
+    </div>
+
+    <!-- 1. Export & Backup Section Title -->
+    <div class="d-flex align-items-center gap-2 mb-3">
+        <i class="bi bi-cloud-arrow-down text-primary fs-5"></i>
+        <h5 class="fw-bold mb-0 text-white">Data Export &amp; Partitioned Database Backups</h5>
+    </div>
+
+    <!-- 4 Colorful Partitioned Backup Cards (Each with 6px Top Gradient Bar & Tinted Icon) -->
+    <div class="row g-3 mb-5">
+        <!-- 1. Multi-DB Backup -->
+        <div class="col-md-6 col-lg-3">
+            <div class="glass-card glass-card-hover h-100 p-4 d-flex flex-column justify-content-between position-relative overflow-hidden">
+                <!-- Top Blue/Indigo Gradient Accent Bar -->
+                <div style="position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, #3b82f6, #6366f1);"></div>
+
+                <div>
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="kpi-icon-box icon-box-indigo">
+                            <i class="bi bi-database-fill-gear"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0 text-white">Multi-DB Backup</h6>
+                            <span class="small text-muted font-monospace" style="font-size: 0.72rem;">Core, Vault &amp; Audit</span>
+                        </div>
+                    </div>
+                    <p class="small text-muted mb-4" style="line-height: 1.55; min-height: 58px;">
+                        Downloads all 3 partitioned SQLite files (<code class="font-monospace small">devvault_core.db</code>, <code class="font-monospace small">devvault_vault.db</code>, <code class="font-monospace small">devvault_audit.db</code>) in a single ZIP.
+                    </p>
+                </div>
+
+                <a href="{{ url_for('export_database_backup') }}" class="btn btn-gradient-indigo btn-sm w-100 rounded-pill py-2">
+                    <i class="bi bi-download me-1"></i> Download Multi-DB (.zip)
+                </a>
+            </div>
+        </div>
+
+        <!-- 2. Full System Backup -->
+        <div class="col-md-6 col-lg-3">
+            <div class="glass-card glass-card-hover h-100 p-4 d-flex flex-column justify-content-between position-relative overflow-hidden">
+                <!-- Top Cyan/Teal Gradient Accent Bar -->
+                <div style="position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, #06b6d4, #14b8a6);"></div>
+
+                <div>
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="kpi-icon-box icon-box-cyan">
+                            <i class="bi bi-archive-fill"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0 text-white">Full System Backup</h6>
+                            <span class="small text-muted font-monospace" style="font-size: 0.72rem;">Databases + Uploads</span>
+                        </div>
+                    </div>
+                    <p class="small text-muted mb-4" style="line-height: 1.55; min-height: 58px;">
+                        Bundles all SQLite database files alongside all uploaded Project Reports, PPT presentations, diagrams, and source code archives.
+                    </p>
+                </div>
+
+                <a href="{{ url_for('export_full_backup_zip') }}" class="btn btn-gradient-cyan btn-sm w-100 rounded-pill py-2">
+                    <i class="bi bi-file-earmark-zip me-1"></i> Full System ZIP
+                </a>
+            </div>
+        </div>
+
+        <!-- 3. CSV Summary -->
+        <div class="col-md-6 col-lg-3">
+            <div class="glass-card glass-card-hover h-100 p-4 d-flex flex-column justify-content-between position-relative overflow-hidden">
+                <!-- Top Emerald/Green Gradient Accent Bar -->
+                <div style="position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, #10b981, #059669);"></div>
+
+                <div>
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="kpi-icon-box icon-box-emerald">
+                            <i class="bi bi-filetype-csv"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0 text-white">CSV Summary</h6>
+                            <span class="small text-muted font-monospace" style="font-size: 0.72rem;">Spreadsheet Catalog</span>
+                        </div>
+                    </div>
+                    <p class="small text-muted mb-4" style="line-height: 1.55; min-height: 58px;">
+                        Export a spreadsheet catalog containing project titles, categories, progress status, tech stack badges, and academic readiness.
+                    </p>
+                </div>
+
+                <a href="{{ url_for('export_all_csv') }}" class="btn btn-gradient-emerald btn-sm w-100 rounded-pill py-2">
+                    <i class="bi bi-file-earmark-spreadsheet me-1"></i> Export Projects CSV
+                </a>
+            </div>
+        </div>
+
+        <!-- 4. JSON Data Export -->
+        <div class="col-md-6 col-lg-3">
+            <div class="glass-card glass-card-hover h-100 p-4 d-flex flex-column justify-content-between position-relative overflow-hidden">
+                <!-- Top Amber/Orange Gradient Accent Bar -->
+                <div style="position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, #f59e0b, #ea580c);"></div>
+
+                <div>
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="kpi-icon-box icon-box-amber">
+                            <i class="bi bi-filetype-json"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0 text-white">JSON Data Export</h6>
+                            <span class="small text-muted font-monospace" style="font-size: 0.72rem;">Machine-Readable</span>
+                        </div>
+                    </div>
+                    <p class="small text-muted mb-4" style="line-height: 1.55; min-height: 58px;">
+                        Export all projects and documentation specifications as structured JSON objects for programmatic ingest or portfolio display.
+                    </p>
+                </div>
+
+                <a href="{{ url_for('export_all_json') }}" class="btn btn-gradient-amber btn-sm w-100 rounded-pill py-2">
+                    <i class="bi bi-code-square me-1"></i> Export All JSON
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Import Section: Local Projects Scanner -->
+    <div class="glass-card shadow-sm mb-4 p-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+            <div>
+                <h5 class="fw-bold mb-1 d-flex align-items-center gap-2 text-white">
+                    <i class="bi bi-folder-symlink text-primary"></i> Import Projects (Local Vault Scanner)
+                </h5>
+                <div class="d-flex align-items-center gap-2 mt-1">
+                    <span class="small text-muted">Scanning root:</span>
+                    <span class="badge font-monospace text-warning px-2 py-1 rounded" style="background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.25);">
+                        <i class="bi bi-folder-fill me-1"></i> {{ root_dir }}
+                    </span>
+                    <span class="small text-muted">({{ local_scan.projects|length }} projects detected)</span>
+                </div>
+            </div>
+            <div class="d-flex gap-2 mt-3 mt-sm-0">
+                <form action="{{ url_for('local_projects_import_all') }}" method="POST">
+                    <input type="hidden" name="next_url" value="{{ url_for('export_hub') }}">
+                    <button type="submit" class="btn btn-gradient-indigo btn-sm rounded-pill px-3 shadow-sm">
+                        <i class="bi bi-box-arrow-in-down me-1"></i> 1-Click Import All
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Local Scanner Table -->
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr class="small text-muted font-monospace border-bottom border-secondary-subtle">
+                        <th class="ps-2">Project Folder</th>
+                        <th>Category</th>
+                        <th>Detected Tech</th>
+                        <th>Attached Files / Archives</th>
+                        <th>Status</th>
+                        <th class="text-end pe-2">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in local_scan.projects %}
+                    <tr>
+                        <td class="ps-2">
+                            <div class="fw-bold text-white">{{ p.title }}</div>
+                            <div class="text-muted font-monospace small d-flex align-items-center gap-1" style="font-size: 0.78rem;">
+                                <i class="bi bi-folder2 text-warning"></i> {{ p.folder_name }}
+                            </div>
+                        </td>
+                        <td>
+                            {% set cat_name = p.category_name | lower %}
+                            {% if 'ai' in cat_name or 'machine' in cat_name %}
+                                <span class="pill-badge pill-ai font-monospace" style="font-size: 0.72rem;">{{ p.category_name }}</span>
+                            {% elif 'web' in cat_name %}
+                                <span class="pill-badge pill-web font-monospace" style="font-size: 0.72rem;">{{ p.category_name }}</span>
+                            {% elif 'academic' in cat_name or 'research' in cat_name %}
+                                <span class="pill-badge pill-academic font-monospace" style="font-size: 0.72rem;">{{ p.category_name }}</span>
+                            {% else %}
+                                <span class="pill-badge pill-mobile font-monospace" style="font-size: 0.72rem;">{{ p.category_name }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex flex-wrap gap-1">
+                                {% for tech in p.detected_techs %}
+                                <span class="pill-tech font-monospace">{{ tech }}</span>
+                                {% else %}
+                                <span class="text-muted small">None</span>
+                                {% endfor %}
+                            </div>
+                        </td>
+                        <td>
+                            {% if p.deliverables|length > 0 %}
+                            <span class="badge bg-primary-subtle text-primary font-monospace" style="font-size: 0.72rem;">
+                                <i class="bi bi-file-earmark-check me-1"></i> {{ p.deliverables|length }} found ({{ p.deliverables[0].deliverable_type }})
+                            </span>
+                            {% else %}
+                            <span class="text-muted small">No archives</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if p.is_imported %}
+                            <span class="badge bg-success-subtle text-success border border-success-subtle font-monospace" style="font-size: 0.72rem;">
+                                <i class="bi bi-check-circle-fill me-1"></i> In Vault
+                            </span>
+                            {% else %}
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle font-monospace" style="font-size: 0.72rem;">
+                                <span class="status-dot-pulse dot-pulse-amber me-1"></span> Local Only
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end pe-2">
+                            {% if p.is_imported %}
+                            <a href="{{ url_for('project_detail', project_id=p.project_id) }}" class="btn btn-outline-secondary btn-sm py-1 px-3 font-monospace rounded-pill" style="font-size: 0.78rem;">
+                                <i class="bi bi-box-arrow-up-right me-1"></i> View
+                            </a>
+                            {% else %}
+                            <form action="{{ url_for('local_projects_import_single') }}" method="POST" class="d-inline">
+                                <input type="hidden" name="folder_name" value="{{ p.folder_name }}">
+                                <input type="hidden" name="next_url" value="{{ url_for('export_hub') }}">
+                                <button type="submit" class="btn btn-gradient-indigo btn-sm py-1 px-3 font-monospace rounded-pill" style="font-size: 0.78rem;">
+                                    <i class="bi bi-cloud-arrow-up me-1"></i> Import
+                                </button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">
+                            <i class="bi bi-folder-x display-6 mb-2 d-block text-secondary"></i>
+                            No local project folders detected in <code class="font-monospace text-warning">{{ root_dir }}</code>.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 3. GitHub Direct Import Card -->
+    <div class="glass-card shadow-sm p-4 position-relative overflow-hidden">
+        <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #6366f1, #a855f7);"></div>
+        <div class="row align-items-center">
+            <div class="col-md-7">
+                <h6 class="fw-bold mb-1 d-flex align-items-center gap-2 text-white">
+                    <i class="bi bi-github text-primary"></i> Quick Pull from GitHub (@AnuragJha100706)
+                </h6>
+                <p class="text-muted small mb-0">Enter any repository slug (e.g. <code class="font-monospace text-primary">AnuragJha100706/repo-name</code>) to pull its README, stars, issues, and metadata into DevVault.</p>
+            </div>
+            <div class="col-md-5 mt-3 mt-md-0">
+                <form action="{{ url_for('github_import') }}" method="POST" class="d-flex gap-2">
+                    <input type="text" name="full_name" class="form-control form-control-sm font-monospace border-secondary-subtle" placeholder="owner/repo-name" required>
+                    <button type="submit" class="btn btn-gradient-indigo btn-sm text-nowrap rounded-pill px-3">
+                        <i class="bi bi-cloud-download me-1"></i> Pull Repo
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
