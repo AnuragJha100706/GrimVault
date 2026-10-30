@@ -27,13 +27,12 @@ function initThemeManager() {
     const themeIcon = document.getElementById('theme-icon');
     const htmlEl = document.documentElement;
 
-    const savedTheme = localStorage.getItem('devvault-theme') || 
-        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-
+    const savedTheme = localStorage.getItem('devvault-theme') || 'dark';
     setTheme(savedTheme);
 
     if (themeToggleBtn) {
-        themeToggleBtn.addEventListener('click', () => {
+        themeToggleBtn.addEventListener('click', (e) => {
+            e.preventDefault();
             const currentTheme = htmlEl.getAttribute('data-bs-theme') || 'dark';
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
             setTheme(newTheme);
@@ -43,11 +42,14 @@ function initThemeManager() {
 
     function setTheme(theme) {
         htmlEl.setAttribute('data-bs-theme', theme);
+        htmlEl.className = theme;
         if (themeIcon) {
             if (theme === 'dark') {
                 themeIcon.className = 'bi bi-sun-fill text-warning';
+                if (themeToggleBtn) themeToggleBtn.setAttribute('title', 'Switch to Light Mode');
             } else {
-                themeIcon.className = 'bi bi-moon-stars-fill text-secondary';
+                themeIcon.className = 'bi bi-moon-stars-fill text-primary';
+                if (themeToggleBtn) themeToggleBtn.setAttribute('title', 'Switch to Dark Mode');
             }
         }
         // Notify components (e.g. charts) of theme change
@@ -146,6 +148,27 @@ window.DevVaultToast = {
    ========================================================================== */
 window.DevVaultCharts = {
     charts: {},
+
+    refreshAll() {
+        const colors = this.getThemeColors();
+        Object.values(this.charts).forEach(chart => {
+            if (!chart) return;
+            if (chart.options.plugins && chart.options.plugins.legend && chart.options.plugins.legend.labels) {
+                chart.options.plugins.legend.labels.color = colors.textColor;
+            }
+            if (chart.options.scales) {
+                if (chart.options.scales.x) {
+                    if (chart.options.scales.x.ticks) chart.options.scales.x.ticks.color = colors.textColor;
+                    if (chart.options.scales.x.grid) chart.options.scales.x.grid.color = colors.gridColor;
+                }
+                if (chart.options.scales.y) {
+                    if (chart.options.scales.y.ticks) chart.options.scales.y.ticks.color = colors.textColor;
+                    if (chart.options.scales.y.grid) chart.options.scales.y.grid.color = colors.gridColor;
+                }
+            }
+            chart.update();
+        });
+    },
 
     getThemeColors() {
         const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
@@ -299,3 +322,10 @@ window.DevVaultCharts = {
         return this.charts[canvasId];
     }
 };
+
+// Global theme change listener to automatically refresh Chart.js themes
+window.addEventListener('themeChanged', () => {
+    if (window.DevVaultCharts && typeof window.DevVaultCharts.refreshAll === 'function') {
+        window.DevVaultCharts.refreshAll();
+    }
+});

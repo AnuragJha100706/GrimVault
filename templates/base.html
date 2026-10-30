@@ -1,9 +1,18 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark" class="dark">
+<html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}DevVault: Engineering Repository & Information Management{% endblock %}</title>
+
+    <!-- Synchronous Theme Setup (Prevents Theme Flash) -->
+    <script>
+        (function() {
+            var savedTheme = localStorage.getItem('devvault-theme') || 'dark';
+            document.documentElement.setAttribute('data-bs-theme', savedTheme);
+            document.documentElement.className = savedTheme;
+        })();
+    </script>
 
     <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -149,7 +158,7 @@
     <div class="devvault-toast-container" id="devvault-toast-container"></div>
 
     <!-- Minimalist Glass Footer -->
-    <footer class="footer py-3 border-top border-secondary-subtle mt-auto" style="background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(8px);">
+    <footer class="footer py-3 border-top mt-auto" style="background: var(--navbar-bg); border-color: var(--navbar-border) !important; backdrop-filter: blur(12px);">
         <div class="container-fluid px-lg-4 d-flex flex-wrap justify-content-between align-items-center small text-muted" style="max-width: 1440px;">
             <div class="d-flex align-items-center gap-2">
                 <span class="brand-gradient-title fs-6">DevVault</span>

@@ -31,7 +31,7 @@
     <!-- 1. Export & Backup Section Title -->
     <div class="d-flex align-items-center gap-2 mb-3">
         <i class="bi bi-cloud-arrow-down text-primary fs-5"></i>
-        <h5 class="fw-bold mb-0 text-white">Data Export &amp; Partitioned Database Backups</h5>
+        <h5 class="fw-bold mb-0 text-body">Data Export &amp; Partitioned Database Backups</h5>
     </div>
 
     <!-- 4 Colorful Partitioned Backup Cards (Each with 6px Top Gradient Bar & Tinted Icon) -->
@@ -48,7 +48,7 @@
                             <i class="bi bi-database-fill-gear"></i>
                         </div>
                         <div>
-                            <h6 class="fw-bold mb-0 text-white">Multi-DB Backup</h6>
+                            <h6 class="fw-bold mb-0 text-body">Multi-DB Backup</h6>
                             <span class="small text-muted font-monospace" style="font-size: 0.72rem;">Core, Vault &amp; Audit</span>
                         </div>
                     </div>
@@ -75,7 +75,7 @@
                             <i class="bi bi-archive-fill"></i>
                         </div>
                         <div>
-                            <h6 class="fw-bold mb-0 text-white">Full System Backup</h6>
+                            <h6 class="fw-bold mb-0 text-body">Full System Backup</h6>
                             <span class="small text-muted font-monospace" style="font-size: 0.72rem;">Databases + Uploads</span>
                         </div>
                     </div>
@@ -102,7 +102,7 @@
                             <i class="bi bi-filetype-csv"></i>
                         </div>
                         <div>
-                            <h6 class="fw-bold mb-0 text-white">CSV Summary</h6>
+                            <h6 class="fw-bold mb-0 text-body">CSV Summary</h6>
                             <span class="small text-muted font-monospace" style="font-size: 0.72rem;">Spreadsheet Catalog</span>
                         </div>
                     </div>
@@ -129,7 +129,7 @@
                             <i class="bi bi-filetype-json"></i>
                         </div>
                         <div>
-                            <h6 class="fw-bold mb-0 text-white">JSON Data Export</h6>
+                            <h6 class="fw-bold mb-0 text-body">JSON Data Export</h6>
                             <span class="small text-muted font-monospace" style="font-size: 0.72rem;">Machine-Readable</span>
                         </div>
                     </div>
@@ -149,7 +149,7 @@
     <div class="glass-card shadow-sm mb-4 p-4">
         <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
             <div>
-                <h5 class="fw-bold mb-1 d-flex align-items-center gap-2 text-white">
+                <h5 class="fw-bold mb-1 d-flex align-items-center gap-2 text-body">
                     <i class="bi bi-folder-symlink text-primary"></i> Import Projects (Local Vault Scanner)
                 </h5>
                 <div class="d-flex align-items-center gap-2 mt-1">
@@ -187,7 +187,7 @@
                     {% for p in local_scan.projects %}
                     <tr>
                         <td class="ps-2">
-                            <div class="fw-bold text-white">{{ p.title }}</div>
+                            <div class="fw-bold text-body">{{ p.title }}</div>
                             <div class="text-muted font-monospace small d-flex align-items-center gap-1" style="font-size: 0.78rem;">
                                 <i class="bi bi-folder2 text-warning"></i> {{ p.folder_name }}
                             </div>
@@ -267,7 +267,7 @@
         <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #6366f1, #a855f7);"></div>
         <div class="row align-items-center">
             <div class="col-md-7">
-                <h6 class="fw-bold mb-1 d-flex align-items-center gap-2 text-white">
+                <h6 class="fw-bold mb-1 d-flex align-items-center gap-2 text-body">
                     <i class="bi bi-github text-primary"></i> Quick Pull from GitHub (@AnuragJha100706)
                 </h6>
                 <p class="text-muted small mb-0">Enter any repository slug (e.g. <code class="font-monospace text-primary">AnuragJha100706/repo-name</code>) to pull its README, stars, issues, and metadata into DevVault.</p>

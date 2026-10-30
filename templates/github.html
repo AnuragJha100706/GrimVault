@@ -56,7 +56,7 @@
 
                     <!-- Profile Name & Handle -->
                     <div class="mb-3">
-                        <h4 class="fw-bold mb-0 text-white">{{ (profile and profile.name) or 'Anurag Kumar' }}</h4>
+                        <h4 class="fw-bold mb-0 text-body">{{ (profile and profile.name) or 'Anurag Kumar' }}</h4>
                         <a href="https://github.com/{{ gh_username or 'AnuragJha100706' }}" target="_blank" class="text-decoration-none small text-primary font-monospace fw-semibold">
                             @{{ gh_username or 'AnuragJha100706' }} <i class="bi bi-box-arrow-up-right small"></i>
                         </a>
@@ -71,13 +71,13 @@
                     <div class="row g-2 mb-4 text-center">
                         <div class="col-4">
                             <div class="stat-box-indigo">
-                                <strong class="fs-5 d-block text-white fw-bold">{{ (profile and profile.public_repos) or repos|length or 13 }}</strong>
+                                <strong class="fs-5 d-block text-body fw-bold">{{ (profile and profile.public_repos) or repos|length or 13 }}</strong>
                                 <span class="small text-muted" style="font-size: 0.72rem;">Public Repos</span>
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="stat-box-purple">
-                                <strong class="fs-5 d-block text-white fw-bold">{{ (profile and profile.followers) or 8 }}</strong>
+                                <strong class="fs-5 d-block text-body fw-bold">{{ (profile and profile.followers) or 8 }}</strong>
                                 <span class="small text-muted" style="font-size: 0.72rem;">Followers</span>
                             </div>
                         </div>
@@ -118,7 +118,7 @@
                         </span>
                     </div>
 
-                    <h4 class="fw-bold mb-2 text-white">Import Repository Into Local Vault</h4>
+                    <h4 class="fw-bold mb-2 text-body">Import Repository Into Local Vault</h4>
                     <p class="text-muted small mb-4" style="line-height: 1.6;">
                         Import any public repository directly into DevVault. This pulls the repository description, primary technology language, live star count, open issues, and remote README content directly into your partitioned SQLite database.
                     </p>
@@ -168,7 +168,7 @@
     <div class="glass-card shadow-sm mb-4 p-4">
         <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom border-secondary-subtle">
             <div>
-                <h5 class="fw-bold mb-1 d-flex align-items-center gap-2 text-white">
+                <h5 class="fw-bold mb-1 d-flex align-items-center gap-2 text-body">
                     <i class="bi bi-code-slash text-primary"></i> Public Repositories ({{ repos|length }})
                 </h5>
                 <p class="text-muted small mb-0">Synchronized public repositories available under @{{ gh_username or 'AnuragJha100706' }}.</p>
@@ -189,7 +189,7 @@
                         <!-- Header: Name & Language Badge -->
                         <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
                             <h6 class="fw-bold mb-0 text-truncate font-monospace" style="max-width: 200px;">
-                                <a href="{{ r.html_url }}" target="_blank" class="text-decoration-none text-white hover-underline" title="{{ r.name }}">
+                                <a href="{{ r.html_url }}" target="_blank" class="text-decoration-none text-body fw-semibold hover-underline" title="{{ r.name }}">
                                     {{ r.name }}
                                 </a>
                             </h6>
@@ -256,7 +256,7 @@
         {% else %}
         <div class="text-center py-5 text-muted small">
             <i class="bi bi-github display-5 mb-3 text-secondary d-block"></i>
-            <h6 class="fw-bold text-white mb-1">No Repositories Synchronized</h6>
+            <h6 class="fw-bold text-body mb-1">No Repositories Synchronized</h6>
             <p class="text-muted">Enter a repository name above or verify your GitHub username and token in settings.</p>
         </div>
         {% endif %}
@@ -270,7 +270,7 @@
         <div class="modal-content glass-card border-secondary-subtle">
             <form action="{{ url_for('github_connect') }}" method="POST">
                 <div class="modal-header border-secondary-subtle">
-                    <h5 class="modal-title fw-bold fs-6 text-white d-flex align-items-center gap-2" id="githubSettingsModalLabel">
+                    <h5 class="modal-title fw-bold fs-6 text-body d-flex align-items-center gap-2" id="githubSettingsModalLabel">
                         <i class="bi bi-github text-primary"></i> GitHub Account &amp; API Settings
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
