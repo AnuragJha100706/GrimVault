@@ -107,8 +107,6 @@ devvault/
 ├── local_projects_service.py   # Filesystem scanner and 1-click importer for local projects
 ├── github_service.py           # GitHub REST API client (repo discovery, metadata sync)
 ├── seed_data.py                # Database seeder with realistic engineering projects
-├── verify_full_system.py       # Full system & database integrity test suite
-├── test_ui_rework.py           # End-to-end UI routes and action verification
 ├── requirements.txt            # Python dependencies
 ├── .env.example                # Environment variables template
 ├── .gitignore                  # Git ignore rules for Python, SQLite logs, and OS files
@@ -182,20 +180,6 @@ python app.py
 Open your browser and navigate to:
 ```
 http://127.0.0.1:5000
-```
-
----
-
-## 🧪 Verification & Test Suites
-
-DevVault includes comprehensive automated verification suites that test database health, template rendering, and action handlers:
-
-```bash
-# Run the full system and multi-database connectivity audit:
-python verify_full_system.py
-
-# Run the 4-page UI rework and end-to-end integration tests:
-python test_ui_rework.py
 ```
 
 ---
